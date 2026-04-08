@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>illy 캡슐 커피 리뷰 대시보드</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #1a1008;
+    --surface: #251a0e;
+    --surface2: #2e2010;
+    --accent: #c8860a;
+    --accent2: #e8a020;
+    --text: #f0e6d3;
+    --text-muted: #a08060;
+    --border: #3d2a10;
+    --red: #c0392b;
+    --brown: #7b4a2a;
+    --blue: #2e6da4;
+    --green: #27ae60;
+    --sky: #2980b9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px 16px;
+  }
+  header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+  header h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--accent2);
+    letter-spacing: -0.5px;
+  }
+  header p {
+    color: var(--text-muted);
+    margin-top: 6px;
+    font-size: 0.9rem;
+  }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+  }
+  .card h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent2);
+    margin-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+  }
+  .chart-wrap { position: relative; height: 260px; }
+  .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 999px;
+    font-size: 0.78rem; font-weight: 600;
+    border: 1px solid transparent;
+  }
+  .pill.red    { background:#3a0a06; border-color:#c0392b; color:#ff7f7f; }
+  .pill.brown  { background:#2e1505; border-color:#7b4a2a; color:#d4845a; }
+  .pill.blue   { background:#051a30; border-color:#2e6da4; color:#7ab8e8; }
+  .pill.sky    { background:#041828; border-color:#2980b9; color:#60aadc; }
+  .pill.brazil { background:#0a1e08; border-color:#27ae60; color:#5ecc7a; }
+  .pill.eth    { background:#1e150a; border-color:#c8860a; color:#e8a020; }
+  .pill.gua    { background:#1a1040; border-color:#8e44ad; color:#c07eff; }
+  .pill.col    { background:#1a1008; border-color:#d4ac0d; color:#f5d34d; }
+</style>
+</head>
+<body>
+<header>
+  <h1>☕ illy 캡슐 커피 리뷰 대시보드</h1>
+  <p>종류별 맛·향·만족도 분석 — 해외 리뷰어 + 국내 사용자 후기 종합</p>
+</header>
+<div class="grid" id="grid"></div>
+
+<script>
+const coffees = [
+  { id:"classico", label:"Classico", color:"#c0392b", roast:"미디엄", intensity:5,
+    scores:{ 맛균형:88, 향복잡도:78, 크레마:72, 바디감:75, 가성비:70 },
+    notes:["카라멜","오렌지 꽃","재스민","고소함","가벼운 산미"],
+    pros:"매일 마시기 좋은 균형감, 개성 있는 플로럴 향",
+    cons:"개성 부족, 라떼엔 맛이 묻힘",
+    rating:4.0, pill:"red" },
+  { id:"intenso", label:"Intenso", color:"#7b4a2a", roast:"다크", intensity:7,
+    scores:{ 맛균형:80, 향복잡도:72, 크레마:80, 바디감:88, 가성비:65 },
+    notes:["다크 코코아","드라이 프루트","우디","약한 감초","묵직한 쓴맛"],
+    pros:"코코아 노트 뚜렷, 우유 음료와 환상 궁합",
+    cons:"섬세한 노트 없음, 다크로스트 대비 가격 의문",
+    rating:4.0, pill:"brown" },
+  { id:"forte", label:"Forte", color:"#2e6da4", roast:"엑스트라 다크", intensity:9,
+    scores:{ 맛균형:60, 향복잡도:55, 크레마:85, 바디감:90, 가성비:50 },
+    notes:["초콜릿","강한 신맛","두꺼운 바디","불분명한 아로마"],
+    pros:"매우 두꺼운 바디감, 진한 크레마",
+    cons:"신맛 과도, 가격 대비 실망, 호불호 최강",
+    rating:3.0, pill:"blue" },
+  { id:"lungo", label:"Lungo", color:"#2980b9", roast:"미디엄(룽고)", intensity:5,
+    scores:{ 맛균형:82, 향복잡도:72, 크레마:68, 바디감:65, 가성비:72 },
+    notes:["카라멜","오렌지 꽃","재스민","마일드","고소함"],
+    pros:"Classico 프로파일 그대로, 더 많은 양",
+    cons:"에스프레소보다 강도 약함",
+    rating:3.8, pill:"sky" },
+  { id:"decaf", label:"Decaf", color:"#27ae60", roast:"미디엄(디카페인)", intensity:5,
+    scores:{ 맛균형:85, 향복잡도:80, 크레마:70, 바디감:74, 가성비:72 },
+    notes:["카라멜","토스티드 브레드","초콜릿","얼 그레이 힌트","달콤한 여운"],
+    pros:"디카페인 최고 수준, 예상 이상의 복잡한 풍미",
+    cons:"사전 분쇄 제품은 압력 유지 어려움",
+    rating:4.5, pill:"sky" },
+  { id:"brazil", label:"브라질 (싱글)", color:"#e8a020", roast:"미디엄", intensity:5,
+    scores:{ 맛균형:90, 향복잡도:82, 크레마:78, 바디감:78, 가성비:75 },
+    notes:["캐러멜","드라이 프루트","달콤함","약한 산미","구수함"],
+    pros:"첫 모금부터 달콤, 누구나 좋아하는 맛, 네스프레소 비교 불가",
+    cons:"개성은 에티오피아보다 약함",
+    rating:4.8, pill:"brazil" },
+  { id:"ethiopia", label:"에티오피아 (싱글)", color:"#c8860a", roast:"미디엄", intensity:4,
+    scores:{ 맛균형:78, 향복잡도:90, 크레마:68, 바디감:65, 가성비:72 },
+    notes:["재스민","감귤류","플로럴","기분 좋은 산미","과실향"],
+    pros:"독보적인 플로럴 아로마, 향 복잡도 최고",
+    cons:"산미 강해 호불호, 바디감 약함",
+    rating:4.0, pill:"eth" },
+  { id:"guatemala", label:"과테말라 (싱글)", color:"#8e44ad", roast:"미디엄", intensity:5,
+    scores:{ 맛균형:83, 향복잡도:85, 크레마:72, 바디감:78, 가성비:72 },
+    notes:["초콜릿","꿀","캐러멜","과일향","광대한 아로마"],
+    pros:"광대하고 복잡한 아로마, 고소하고 부드러운 목넘김",
+    cons:"다소 복잡해 초보자엔 부담",
+    rating:4.2, pill:"gua" },
+  { id:"colombia", label:"콜롬비아 (싱글)", color:"#d4ac0d", roast:"미디엄", intensity:5,
+    scores:{ 맛균형:85, 향복잡도:80, 크레마:72, 바디감:76, 가성비:72 },
+    notes:["캐러멜","너트","초콜릿","구운 빵","단맛·신맛 균형"],
+    pros:"단맛과 산미의 완벽한 균형, 풀 바디",
+    cons:"개성은 에티오피아나 과테말라보다 약함",
+    rating:4.1, pill:"col" },
+];
+
+const SCORE_LABELS = ["맛균형","향복잡도","크레마","바디감","가성비"];
+const SCORE_COLORS = ["#e8a020","#c8860a","#a06030","#604020","#402010"];
+
+const grid = document.getElementById("grid");
+
+// ─── 1. 만족도 바 차트 ──────────────────────────────────────
+const card1 = document.createElement("div");
+card1.className = "card";
+card1.style.gridColumn = "1 / -1";
+card1.innerHTML = `<h2>⭐ 종합 만족도 비교</h2><div class="chart-wrap"><canvas id="ratingChart"></canvas></div>`;
+grid.appendChild(card1);
+
+// ─── 2. 레이더 차트 (선택형) ──────────────────────────────
+const card2 = document.createElement("div");
+card2.className = "card";
+card2.style.gridColumn = "1 / -1";
+card2.innerHTML = `
+  <h2>🕸 항목별 프로파일 비교 <span id="radarNote" style="font-size:0.78rem;color:var(--text-muted);font-weight:400;">(최대 3개 선택)</span></h2>
+  <div id="pillRow" class="pill-row" style="margin-bottom:14px;"></div>
+  <div class="chart-wrap"><canvas id="radarChart"></canvas></div>`;
+grid.appendChild(card2);
+
+// ─── 3. 상세 테이블 ────────────────────────────────────────
+const card3 = document.createElement("div");
+card3.className = "card";
+card3.style.gridColumn = "1 / -1";
+card3.innerHTML = `
+  <h2>📋 상세 리뷰 테이블</h2>
+  <div style="overflow-x:auto;">
+  <table id="reviewTable" style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+    <thead>
+      <tr style="background:var(--surface2);color:var(--accent2);">
+        <th style="padding:10px 8px;text-align:left;">종류</th>
+        <th>로스트</th><th>강도</th><th>만족도</th>
+        <th style="text-align:left;">맛 노트</th>
+        <th style="text-align:left;">👍 장점</th>
+        <th style="text-align:left;">👎 단점</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table></div>`;
+grid.appendChild(card3);
+
+// ─── 차트 렌더 ─────────────────────────────────────────────
+const FONT = { family:"'Apple SD Gothic Neo','Pretendard',sans-serif", size:11 };
+
+// 1. 만족도 바
+new Chart(document.getElementById("ratingChart"), {
+  type:"bar",
+  data:{
+    labels: coffees.map(c=>c.label),
+    datasets:[{
+      label:"만족도",
+      data: coffees.map(c=>c.rating),
+      backgroundColor: coffees.map(c=>c.color+"bb"),
+      borderColor: coffees.map(c=>c.color),
+      borderWidth:2, borderRadius:8,
+    }]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{display:false},
+      tooltip:{
+        callbacks:{
+          label: ctx => {
+            const c = coffees[ctx.dataIndex];
+            return [`만족도: ${c.rating}/5`, `강도: ${c.intensity}/9`];
+          }
+        }
+      }
+    },
+    scales:{
+      y:{ min:0, max:5, ticks:{color:"#a08060",font:FONT}, grid:{color:"#3d2a10"} },
+      x:{ ticks:{color:"#f0e6d3",font:{...FONT,size:12}}, grid:{display:false} }
+    }
+  }
+});
+
+// 2. 레이더 (인터랙티브)
+let selected = ["classico","brazil","decaf"];
+const pillRow = document.getElementById("pillRow");
+
+coffees.forEach(c => {
+  const p = document.createElement("span");
+  p.className = `pill ${c.pill}`;
+  p.id = `pill_${c.id}`;
+  p.style.cursor = "pointer";
+  p.textContent = c.label;
+  p.style.opacity = selected.includes(c.id) ? "1" : "0.35";
+  p.addEventListener("click", () => {
+    if(selected.includes(c.id)) {
+      if(selected.length > 1) selected = selected.filter(x=>x!==c.id);
+    } else {
+      if(selected.length < 3) selected.push(c.id);
+    }
+    updatePills(); updateRadar();
+  });
+  pillRow.appendChild(p);
+});
+
+function updatePills(){
+  coffees.forEach(c=>{
+    document.getElementById(`pill_${c.id}`).style.opacity = selected.includes(c.id)?"1":"0.35";
+  });
+}
+</script>
+
+const radarCtx = document.getElementById("radarChart");
+let radarChart = null;
+
+function getRadarDatasets(){
+  return selected.map(id => {
+    const c = coffees.find(x=>x.id===id);
+    return {
+      label: c.label,
+      data: SCORE_LABELS.map(k=>c.scores[k]),
+      backgroundColor: c.color+"33",
+      borderColor: c.color,
+      borderWidth:2,
+      pointBackgroundColor: c.color,
+      pointRadius:4,
+    };
+  });
+}
+
+function updateRadar(){
+  if(radarChart){ radarChart.destroy(); }
+  radarChart = new Chart(radarCtx, {
+    type:"radar",
+    data:{ labels:SCORE_LABELS, datasets:getRadarDatasets() },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:"#f0e6d3",font:FONT}}},
+      scales:{r:{
+        min:40, max:100,
+        ticks:{display:false},
+        grid:{color:"#3d2a10"},
+        pointLabels:{color:"#e8a020",font:{...FONT,size:12}},
+        angleLines:{color:"#3d2a10"},
+      }}
+    }
+  });
+}
+updateRadar();
+
+// 3. 테이블
+const tbody = document.querySelector("#reviewTable tbody");
+coffees.forEach(c => {
+  const tr = document.createElement("tr");
+  tr.style.borderBottom = "1px solid var(--border)";
+  const stars = "★".repeat(Math.floor(c.rating)) + (c.rating%1>=0.5?"½":"") + "☆".repeat(5-Math.ceil(c.rating));
+  tr.innerHTML = `
+    <td style="padding:10px 8px;font-weight:700;color:${c.color};">${c.label}</td>
+    <td style="text-align:center;color:var(--text-muted);">${c.roast}</td>
+    <td style="text-align:center;">
+      <span style="background:${c.color}33;border:1px solid ${c.color};border-radius:99px;padding:2px 10px;font-size:0.8rem;font-weight:700;">${c.intensity}/9</span>
+    </td>
+    <td style="text-align:center;font-size:0.9rem;color:#e8a020;letter-spacing:1px;" title="${c.rating}/5">${c.rating}★</td>
+    <td style="color:#c8a070;max-width:200px;">${c.notes.map(n=>`<span style="display:inline-block;background:#2e1a08;border-radius:4px;padding:1px 6px;margin:2px;font-size:0.75rem;">${n}</span>`).join("")}</td>
+    <td style="color:#7ecb9a;font-size:0.8rem;max-width:180px;">${c.pros}</td>
+    <td style="color:#e07070;font-size:0.8rem;max-width:180px;">${c.cons}</td>
+  `;
+  tbody.appendChild(tr);
+});
+</script>
+</body>
+</html>
