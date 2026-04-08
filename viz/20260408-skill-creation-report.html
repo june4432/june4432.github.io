@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>스킬 제작 리포트 — June</title>
+<style>
+:root{--p:#6366f1;--s:#06b6d4;--a:#f59e0b;--g:#10b981;--bg:#fff;--sf:#f8fafc;--bd:#e2e8f0;--tx:#1e293b;--mu:#64748b}
+@media(prefers-color-scheme:dark){:root{--bg:#0f172a;--sf:#1e293b;--bd:#334155;--tx:#f1f5f9;--mu:#94a3b8}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);line-height:1.6;padding:24px 16px;max-width:860px;margin:0 auto}
+h1{font-size:22px;font-weight:600;margin-bottom:4px}
+.sub{color:var(--mu);font-size:14px;margin-bottom:28px}
+.tabs{display:flex;gap:4px;margin-bottom:24px;border-bottom:1px solid var(--bd)}
+.tab{padding:8px 16px;font-size:14px;border:none;background:none;color:var(--mu);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:.15s}
+.tab.on{color:var(--p);border-bottom-color:var(--p);font-weight:500}
+.panel{display:none}.panel.on{display:block}
+.tl{position:relative;padding-left:28px}
+.tl::before{content:'';position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:var(--bd)}
+.ti{position:relative;margin-bottom:18px}
+.dot{position:absolute;left:-24px;top:5px;width:12px;height:12px;border-radius:50%;border:2px solid var(--bg);outline:2px solid var(--p);background:var(--p)}
+.dot.g{background:var(--g);outline-color:var(--g)}.dot.s{background:var(--s);outline-color:var(--s)}.dot.a{background:var(--a);outline-color:var(--a)}
+.tc{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:12px 16px}
+.tc h3{font-size:14px;font-weight:600;margin-bottom:3px}
+.tc p{font-size:13px;color:var(--mu)}
+.tags{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:11px;padding:2px 8px;border-radius:999px;background:var(--sf);border:1px solid var(--bd);color:var(--mu)}
+.tag.p{background:#ede9fe;border-color:#c4b5fd;color:#6d28d9}
+.tag.g{background:#d1fae5;border-color:#6ee7b7;color:#065f46}
+.tag.a{background:#fef3c7;border-color:#fcd34d;color:#92400e}
+.tag.s{background:#cffafe;border-color:#67e8f9;color:#164e63}
+@media(prefers-color-scheme:dark){.tag.p{background:#2e1065;border-color:#6d28d9;color:#c4b5fd}.tag.g{background:#064e3b;border-color:#065f46;color:#6ee7b7}.tag.a{background:#451a03;border-color:#92400e;color:#fcd34d}.tag.s{background:#083344;border-color:#164e63;color:#67e8f9}}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:20px;cursor:pointer;transition:.15s}
+.card:hover{border-color:var(--p)}
+.card .ico{font-size:26px;margin-bottom:10px}
+.card h3{font-size:15px;font-weight:600;margin-bottom:5px}
+.card p{font-size:13px;color:var(--mu);margin-bottom:10px}
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;background:#ede9fe;border:1px solid #c4b5fd;color:#6d28d9}
+@media(prefers-color-scheme:dark){.badge{background:#2e1065;border-color:#6d28d9;color:#c4b5fd}}
+.detail{margin-top:10px;padding:12px;background:var(--bg);border:1px solid var(--bd);border-radius:8px;font-size:13px;color:var(--mu);display:none}
+.detail.on{display:block}.detail ul{padding-left:16px}.detail li{margin-bottom:3px}
+.ig{display:grid;gap:12px}
+.ic{display:flex;gap:14px;align-items:flex-start;background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px 16px}
+.num{min-width:28px;height:28px;border-radius:50%;background:var(--p);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600}
+.ib h4{font-size:14px;font-weight:600;margin-bottom:3px}
+.ib p{font-size:13px;color:var(--mu)}
+</style>
+</head>
+<body>
+<h1>🛠 스킬 제작 세션 리포트</h1>
+<p class="sub">2026-04-08 · research-and-gather + conversation-visualizer + viz-to-github 제작 과정</p>
+<nav class="tabs">
+  <button class="tab on" onclick="sw('tl',this)">타임라인</button>
+  <button class="tab" onclick="sw('sk',this)">제작된 스킬</button>
+  <button class="tab" onclick="sw('in',this)">핵심 인사이트</button>
+</nav>
+
+<div id="p-tl" class="panel on">
+<div class="tl">
+  <div class="ti"><div class="dot s"></div><div class="tc"><h3>아이디어 발산</h3><p>자료조사 → 시각화 → 메타시각화 → GitHub 배포 순으로 진행하는 메타적 접근</p><div class="tags"><span class="tag s">기획</span></div></div></div>
+  <div class="ti"><div class="dot s"></div><div class="tc"><h3>skill-creator + 인터넷 자료조사</h3><p>deep-research 8단계, Progressive Disclosure, 환각 방지 구조 수집</p><div class="tags"><span class="tag s">리서치</span><span class="tag">레퍼런스 6개</span></div></div></div>
+  <div class="ti"><div class="dot"></div><div class="tc"><h3>research-and-gather 제작</h3><p>4방향 키워드 발산 · /tmp 중간저장 · 파일만 참조 리포트</p><div class="tags"><span class="tag p">스킬 제작</span><span class="tag">환각 방지</span></div></div></div>
+  <div class="ti"><div class="dot g"></div><div class="tc"><h3>자료조사 스킬 테스트 통과</h3><p>"시각화 스킬 패턴 자료조사해줘" 실행 · 중간파일 6개 · 리포트 정상 생성</p><div class="tags"><span class="tag g">테스트 통과</span></div></div></div>
+  <div class="ti"><div class="dot s"></div><div class="tc"><h3>시각화 스킬 조사 (방금 만든 스킬로!)</h3><p>Mermaid / Excalidraw / D3.js 패턴 · 차트 타입 선택 프레임워크</p><div class="tags"><span class="tag s">스킬 연계</span></div></div></div>
+  <div class="ti"><div class="dot"></div><div class="tc"><h3>conversation-visualizer 제작</h3><p>4트랙(Mermaid/Excalidraw/React/HTML) · chart-types + mermaid-rules 번들</p><div class="tags"><span class="tag p">스킬 제작</span><span class="tag">references 번들</span></div></div></div>
+  <div class="ti"><div class="dot a"></div><div class="tc"><h3>메타 시각화 생성</h3><p>conversation-visualizer가 자신의 탄생 과정을 SVG + HTML로 시각화</p><div class="tags"><span class="tag a">메타!</span></div></div></div>
+  <div class="ti"><div class="dot g"></div><div class="tc"><h3>3개 스킬 /mnt/skills/user/ 설치</h3><p>다음 대화부터 자동 트리거</p><div class="tags"><span class="tag g">설치 완료</span><span class="tag">총 스킬 7개</span></div></div></div>
+  <div class="ti"><div class="dot"></div><div class="tc"><h3>june4432.github.io 세팅</h3><p>GitHub API로 레포 생성 · .nojekyll · Pages 배포 확인</p><div class="tags"><span class="tag p">인프라</span></div></div></div>
+  <div class="ti"><div class="dot a"></div><div class="tc"><h3>viz-to-github 스킬 제작 + 이 파일 배포!</h3><p>HTML → git push → URL 반환 자동화 · 지금 이 순간</p><div class="tags"><span class="tag a">메타²</span><span class="tag g">배포됨</span></div></div></div>
+</div>
+</div>
+
+<div id="p-sk" class="panel">
+<div class="grid">
+  <div class="card" onclick="td('d1')">
+    <div class="ico">🔍</div><h3>research-and-gather</h3>
+    <p>웹 검색 기반 자료조사. 발산→수집→저장→수렴. 환각 방지 핵심.</p>
+    <span class="badge">자료조사</span>
+    <div id="d1" class="detail"><ul>
+      <li>트리거: "자료조사해줘", "리서치"</li>
+      <li>키워드 4방향 발산 → 멀티쿼리</li>
+      <li>/tmp 중간 저장 → 파일만 참조</li>
+      <li>빠른 모드: 쿼리 3개, fetch 스킵</li>
+    </ul></div>
+  </div>
+  <div class="card" onclick="td('d2')">
+    <div class="ico">📊</div><h3>conversation-visualizer</h3>
+    <p>대화·데이터를 시각화. Mermaid / Excalidraw / React / HTML 4트랙.</p>
+    <span class="badge">시각화</span>
+    <div id="d2" class="detail"><ul>
+      <li>트랙 A: Mermaid 다이어그램</li>
+      <li>트랙 B: Excalidraw 자유형</li>
+      <li>트랙 C: React + Recharts 차트</li>
+      <li>트랙 D: HTML 인터랙티브</li>
+    </ul></div>
+  </div>
+  <div class="card" onclick="td('d3')">
+    <div class="ico">🚀</div><h3>viz-to-github</h3>
+    <p>HTML → june4432.github.io/viz/ 자동 push → URL 반환.</p>
+    <span class="badge">배포</span>
+    <div id="d3" class="detail"><ul>
+      <li>슬러그 자동 생성 (날짜+주제)</li>
+      <li>index.html 카드 자동 추가</li>
+      <li>키체인 토큰 안전 처리</li>
+      <li>배포 완료 폴링 후 URL 반환</li>
+    </ul></div>
+  </div>
+</div>
+</div>
+
+<div id="p-in" class="panel">
+<div class="ig">
+  <div class="ic"><div class="num">1</div><div class="ib"><h4>메타 접근이 가장 효과적인 테스트</h4><p>자료조사 스킬로 시각화 스킬을 조사하고, 시각화 스킬로 오늘 과정을 시각화하고, 배포 스킬로 이 파일을 배포. 제작 과정 자체가 테스트.</p></div></div>
+  <div class="ic"><div class="num">2</div><div class="ib"><h4>환각 방지 = 중간 저장 분리</h4><p>기억이 아니라 파일만 참조. 검색 → 파일 저장 → 파일 읽기 → 리포트 순서가 핵심.</p></div></div>
+  <div class="ic"><div class="num">3</div><div class="ib"><h4>발산(리서치) → 수렴(시각화) → 공유(배포)</h4><p>세 스킬이 자연스러운 파이프라인을 형성. 저장 스킬까지 연결되면 완전한 워크플로우.</p></div></div>
+  <div class="ic"><div class="num">4</div><div class="ib"><h4>GitHub Pages = 아이폰 호환 해결</h4><p>Claude.ai artifact 렌더링 한계를 우회. 생성된 HTML을 공개 URL로 만들어서 어디서든 접근 가능.</p></div></div>
+</div>
+</div>
+
+<script>
+function sw(id,btn){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));document.getElementById('p-'+id).classList.add('on');btn.classList.add('on')}
+function td(id){document.getElementById(id).classList.toggle('on')}
+</script>
+</body>
+</html>
