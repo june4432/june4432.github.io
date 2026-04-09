@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>8주 미토콘드리아 러닝 플랜</title>
+<style>
+:root {
+  --c-primary:   #6366f1;
+  --c-accent:    #f59e0b;
+  --c-success:   #10b981;
+  --c-danger:    #ef4444;
+  --c-bg:        #ffffff;
+  --c-surface:   #f8fafc;
+  --c-border:    #e2e8f0;
+  --c-text:      #1e293b;
+  --c-muted:     #64748b;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --c-bg:      #0f172a;
+    --c-surface: #1e293b;
+    --c-border:  #334155;
+    --c-text:    #f1f5f9;
+    --c-muted:   #94a3b8;
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--c-bg); color: var(--c-text);
+  padding: 24px 16px; max-width: 760px; margin: 0 auto;
+}
+h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+.subtitle { font-size: 13px; color: var(--c-muted); margin-bottom: 28px; }
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.tab {
+  padding: 6px 14px; border-radius: 20px; font-size: 13px;
+  border: 1px solid var(--c-border); background: transparent;
+  color: var(--c-muted); cursor: pointer; transition: all .18s;
+}
+.tab.active { background: var(--c-primary); color: #fff; border-color: var(--c-primary); }
+.panel { display: none; }
+.panel.active { display: block; }
+.phase-desc {
+  font-size: 13px; color: var(--c-muted); margin-bottom: 14px;
+  padding: 10px 14px; border-left: 3px solid var(--c-primary);
+  background: var(--c-surface); border-radius: 0 8px 8px 0;
+}
+</style>
+</head>
+<body>
+
+<style>
+.week-card {
+  border: 1px solid var(--c-border); border-radius: 10px;
+  padding: 14px 16px; margin-bottom: 10px; background: var(--c-bg);
+}
+.week-title { font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+.days { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.pill {
+  display: inline-flex; align-items: center;
+  padding: 4px 10px; border-radius: 14px; font-size: 12px; font-weight: 500;
+}
+.pill-z2     { background: #d1fae5; color: #065f46; }
+.pill-hiit   { background: #fee2e2; color: #991b1b; }
+.pill-str    { background: #dbeafe; color: #1e40af; }
+.pill-breath { background: #fef3c7; color: #92400e; }
+.pill-rest   { background: var(--c-surface); color: var(--c-muted); }
+@media (prefers-color-scheme: dark) {
+  .pill-z2     { background: #064e3b; color: #6ee7b7; }
+  .pill-hiit   { background: #7f1d1d; color: #fca5a5; }
+  .pill-str    { background: #1e3a5f; color: #93c5fd; }
+  .pill-breath { background: #78350f; color: #fde68a; }
+}
+.week-note { font-size: 12px; color: var(--c-muted); line-height: 1.6; }
+.metrics { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 14px; }
+.metric {
+  text-align: center; padding: 12px 8px; border-radius: 8px;
+  background: var(--c-surface); border: 1px solid var(--c-border);
+}
+.metric .val { font-size: 18px; font-weight: 600; color: var(--c-primary); display: block; }
+.metric .lbl { font-size: 11px; color: var(--c-muted); margin-top: 3px; }
+.overview-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 24px; }
+.overview-card {
+  border: 1px solid var(--c-border); border-radius: 10px;
+  padding: 12px; background: var(--c-surface); text-align: center;
+}
+.oc-phase { font-size: 11px; color: var(--c-muted); margin-bottom: 4px; }
+.oc-weeks { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.oc-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin: 0 2px; }
+.oc-focus { font-size: 11px; color: var(--c-muted); margin-top: 6px; line-height: 1.4; }
+.breath-step {
+  border: 1px solid var(--c-border); border-radius: 10px;
+  padding: 14px 16px; margin-bottom: 10px;
+}
+.breath-step-num {
+  display: inline-block; width: 22px; height: 22px; border-radius: 50%;
+  background: var(--c-accent); color: #fff; font-size: 12px; font-weight: 600;
+  text-align: center; line-height: 22px; margin-right: 8px;
+}
+.breath-step-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; }
+.breath-body { font-size: 13px; line-height: 1.7; padding-left: 30px; }
+.principle-box {
+  border: 1px solid var(--c-border); border-radius: 10px;
+  padding: 14px 16px; margin-top: 20px; background: var(--c-surface);
+}
+.principle-box h3 { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+.principle-box ul { list-style: none; padding: 0; }
+.principle-box li {
+  font-size: 12px; color: var(--c-muted); padding: 3px 0 3px 14px;
+  position: relative; line-height: 1.6;
+}
+.principle-box li::before { content: "·"; position: absolute; left: 0; color: var(--c-primary); }
+.divider { height: 1px; background: var(--c-border); margin: 20px 0; }
+@media (max-width: 500px) {
+  .overview-grid { grid-template-columns: repeat(2,1fr); }
+  .metrics { grid-template-columns: repeat(2,1fr); }
+}
+</style>
+
+<h1>8주 미토콘드리아 러닝 플랜</h1>
+<p class="subtitle">현재 주 1회 40분 → 8주 후 Zone 2 + HIIT + 근력 시스템 구축</p>
+
+<div class="overview-grid">
+  <div class="overview-card">
+    <div class="oc-phase">Phase 1</div>
+    <div class="oc-weeks">1–3주</div>
+    <div><span class="oc-dot" style="background:#10b981"></span><span class="oc-dot" style="background:#10b981"></span></div>
+    <div class="oc-focus">Zone 2 베이스<br>주 2회 정착</div>
+  </div>
+  <div class="overview-card">
+    <div class="oc-phase">Phase 2</div>
+    <div class="oc-weeks">4–6주</div>
+    <div><span class="oc-dot" style="background:#10b981"></span><span class="oc-dot" style="background:#6366f1"></span><span class="oc-dot" style="background:#10b981"></span></div>
+    <div class="oc-focus">볼륨 증가<br>근력 추가</div>
+  </div>
+  <div class="overview-card">
+    <div class="oc-phase">Phase 3</div>
+    <div class="oc-weeks">7–8주</div>
+    <div><span class="oc-dot" style="background:#10b981"></span><span class="oc-dot" style="background:#6366f1"></span><span class="oc-dot" style="background:#ef4444"></span></div>
+    <div class="oc-focus">HIIT 도입<br>다이나믹스 개선</div>
+  </div>
+  <div class="overview-card">
+    <div class="oc-phase">매일</div>
+    <div class="oc-weeks">호흡</div>
+    <div><span class="oc-dot" style="background:#f59e0b"></span></div>
+    <div class="oc-focus">횡격막 → 박스<br>→ 저산소</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab(0)">Phase 1 · 1–3주</button>
+  <button class="tab" onclick="switchTab(1)">Phase 2 · 4–6주</button>
+  <button class="tab" onclick="switchTab(2)">Phase 3 · 7–8주</button>
+  <button class="tab" onclick="switchTab(3)">호흡 훈련</button>
+</div>
+
+<!-- Phase 1 -->
+<div class="panel active" id="panel-0">
+  <div class="phase-desc">목표: Zone 2 베이스 구축 · 미토콘드리아 연료전환 적응</div>
+  <div class="week-card">
+    <div class="week-title">1주차 — 현재 유지</div>
+    <div class="days">
+      <span class="pill pill-z2">화 · Zone 2 40분</span>
+      <span class="pill pill-rest">나머지 · 걷기 or 휴식</span>
+      <span class="pill pill-breath">매일 · 호흡 5분</span>
+    </div>
+    <div class="week-note">코로만 호흡 가능한 강도 · 최대심박 60–70% · 심박 130–140 bpm</div>
+  </div>
+  <div class="week-card">
+    <div class="week-title">2–3주차 — 주 2회 시작</div>
+    <div class="days">
+      <span class="pill pill-z2">화 · Zone 2 40분</span>
+      <span class="pill pill-z2">금 · Zone 2 40분</span>
+      <span class="pill pill-breath">매일 · 호흡 5–10분</span>
+    </div>
+    <div class="week-note">두 세션 완전 동일 강도 · "너무 쉽다" 싶은 페이스가 맞는 페이스<br>Zone 3 침범 절대 금지 — 심박 올라가면 걷기로 전환</div>
+  </div>
+  <div class="metrics">
+    <div class="metric"><span class="val">60–70%</span><span class="lbl">최대심박 기준</span></div>
+    <div class="metric"><span class="val">코호흡</span><span class="lbl">강도 체크법</span></div>
+    <div class="metric"><span class="val">NEVER</span><span class="lbl">Zone 3+ 침범</span></div>
+  </div>
+</div>
+
+<!-- Phase 2 -->
+<div class="panel" id="panel-1">
+  <div class="phase-desc">목표: 볼륨 점진 증가 + 근력/코어 추가 — 러닝 다이나믹스 기반 구축</div>
+  <div class="week-card">
+    <div class="week-title">4주차 — 근력 추가</div>
+    <div class="days">
+      <span class="pill pill-z2">화 · Zone 2 45분</span>
+      <span class="pill pill-str">목 · 근력 30분</span>
+      <span class="pill pill-z2">토 · Zone 2 45분</span>
+      <span class="pill pill-breath">매일 · 호흡 10분</span>
+    </div>
+    <div class="week-note">근력: 스쿼트 · 런지 · 힙힌지 · 플랭크 위주 · 자체중량으로 시작<br>런 ↔ 근력 48시간 간격 유지</div>
+  </div>
+  <div class="week-card">
+    <div class="week-title">5–6주차 — 볼륨 증가</div>
+    <div class="days">
+      <span class="pill pill-z2">화 · Zone 2 50분</span>
+      <span class="pill pill-str">목 · 근력 35분</span>
+      <span class="pill pill-z2">토 · Zone 2 50분</span>
+      <span class="pill pill-breath">매일 · 호흡 10분</span>
+    </div>
+    <div class="week-note">러닝 세션당 +5분 증가 · 강도는 Zone 2 유지<br>근력: 15–20rep 고반복 위주</div>
+  </div>
+  <div class="metrics">
+    <div class="metric"><span class="val">+5분</span><span class="lbl">주당 증가 상한</span></div>
+    <div class="metric"><span class="val">3종목</span><span class="lbl">근력 핵심 운동</span></div>
+    <div class="metric"><span class="val">48h</span><span class="lbl">런↔근력 간격</span></div>
+  </div>
+</div>
+
+<!-- Phase 3 -->
+<div class="panel" id="panel-2">
+  <div class="phase-desc">목표: 첫 HIIT 도입 · VO2max 자극 · 러닝 다이나믹스 드릴 시작</div>
+  <div class="week-card">
+    <div class="week-title">7주차 — HIIT 입문</div>
+    <div class="days">
+      <span class="pill pill-z2">화 · Zone 2 50분</span>
+      <span class="pill pill-str">목 · 근력 35분</span>
+      <span class="pill pill-hiit">토 · HIIT 입문 30분</span>
+      <span class="pill pill-breath">매일 · 호흡 10분</span>
+    </div>
+    <div class="week-note">HIIT: 워밍업 10분 → 1분 전력 + 2분 걷기 × 5세트 → 쿨다운 5분<br>전력 구간: 최대심박 90–95% · 말 못할 정도 강도</div>
+  </div>
+  <div class="week-card">
+    <div class="week-title">8주차 — HIIT 세트 증가</div>
+    <div class="days">
+      <span class="pill pill-z2">화 · Zone 2 55분</span>
+      <span class="pill pill-str">목 · 근력 35분</span>
+      <span class="pill pill-hiit">토 · HIIT 35분</span>
+      <span class="pill pill-breath">매일 · 호흡 10분</span>
+    </div>
+    <div class="week-note">HIIT: 1분 전력 + 2분 걷기 × 6세트 · 운동:휴식 = 1:2 비율<br>8주 이후 플랜은 피로도·심박 데이터 보고 결정</div>
+  </div>
+  <div class="metrics">
+    <div class="metric"><span class="val">1회/주</span><span class="lbl">HIIT 최대 횟수</span></div>
+    <div class="metric"><span class="val">1:2</span><span class="lbl">운동:휴식 비율</span></div>
+    <div class="metric"><span class="val">Z2 우선</span><span class="lbl">베이스 원칙</span></div>
+  </div>
+</div>
+
+<!-- Breathing -->
+<div class="panel" id="panel-3">
+  <div class="phase-desc">매일 5–10분 · 러닝 전후 또는 취침 전 · 신경계 훈련</div>
+  <div class="breath-step">
+    <div class="breath-step-title"><span class="breath-step-num">1</span>횡격막 호흡 (1–4주)</div>
+    <div class="breath-body">배에 손을 올리고 코로 4초 들이마시며 배 팽창 → 6초 내쉬기<br>누워서 시작 → 앉아서 → 서서 순서로 난이도 올리기<br>목표: 1회 호흡 10초 리듬 안정화</div>
+  </div>
+  <div class="breath-step">
+    <div class="breath-step-title"><span class="breath-step-num">2</span>박스 브리딩 (5–6주)</div>
+    <div class="breath-body">4초 흡 → 4초 홀드 → 4초 호 → 4초 홀드 반복<br>러닝 중 코호흡 유지 가능 = Zone 2 강도 확인 지표<br>목표: 달리면서도 코호흡 30분 유지</div>
+  </div>
+  <div class="breath-step">
+    <div class="breath-step-title"><span class="breath-step-num">3</span>저산소 자극 (7–8주)</div>
+    <div class="breath-body">숨 참기 워킹: 코로 흡 → 10–15초 참으며 걷기 → 반복 5회<br>폐활량 + 이산화탄소 내성 동시 훈련<br>목표: EPO 분비 자극 · 산소운반능력 향상</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+<div class="principle-box">
+  <h3>공통 원칙</h3>
+  <ul>
+    <li>수면 7시간 이상 — 미토콘드리아는 쉬는 동안 새로 생성됨</li>
+    <li>단백질 체중(kg) × 1.6g 이상 섭취 · 철분·B12 결핍 체크</li>
+    <li>근육통 있으면 Zone 2도 건너뛰기 · 피로 쌓이면 역효과</li>
+    <li>2주마다 1주는 볼륨 10% 감소 (디로드 주) — 장기 적응 필수</li>
+    <li>러닝 전 다이나믹 스트레칭 5분 · 후 정적 스트레칭 5분</li>
+    <li>심박수 모니터 있으면 Zone 2 강도 정확히 맞출 것</li>
+  </ul>
+</div>
+<p style="font-size:11px;color:var(--c-muted);text-align:center;margin-top:24px">generated via Claude · june4432.github.io</p>
+<script>
+function switchTab(idx) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+  document.querySelectorAll('.panel').forEach((p,i) => p.classList.toggle('active', i===idx));
+}
+</script>
+</body>
+</html>
