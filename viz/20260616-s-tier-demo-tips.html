@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S-tier 데모를 만드는 24가지 팁</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #14110f;
+    --paper: #f6f2e9;
+    --stage: #1a1714;
+    --spot: #ffd23f;
+    --spot-soft: #ffe89a;
+    --line: #d8cfbd;
+    --muted: #6f675b;
+    --sec1: #ff6b4a;
+    --sec2: #ffd23f;
+    --sec3: #5ec8c2;
+    --sec4: #c08bf0;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans KR', sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+
+  /* HERO */
+  .hero {
+    background: var(--stage);
+    color: var(--paper);
+    padding: 88px 0 76px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -180px; left: 50%;
+    width: 520px; height: 520px;
+    transform: translateX(-50%);
+    background: radial-gradient(circle, rgba(255,210,63,0.28) 0%, rgba(255,210,63,0) 62%);
+    pointer-events: none;
+  }
+  .eyebrow {
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: var(--spot);
+    margin-bottom: 22px;
+  }
+  .hero h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: clamp(38px, 7vw, 68px);
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+  }
+  .hero h1 .glow { color: var(--spot); }
+  .hero p.lede {
+    margin-top: 26px;
+    max-width: 560px;
+    font-size: 18px;
+    color: #cfc7b8;
+  }
+  .meta {
+    margin-top: 30px;
+    font-size: 13px;
+    color: #8d8576;
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: 0.04em;
+  }
+  .meta a { color: var(--spot-soft); text-decoration: none; border-bottom: 1px solid rgba(255,232,154,0.35); }
+  .meta a:hover { border-color: var(--spot-soft); }
+
+  /* TLDR */
+  .tldr { padding: 56px 0 8px; }
+  .tldr h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 22px;
+  }
+  .tldr ul { list-style: none; display: grid; gap: 14px; }
+  .tldr li { padding-left: 30px; position: relative; font-size: 16.5px; }
+  .tldr li::before {
+    content: "\25B8"; position: absolute; left: 4px; color: var(--sec1); font-size: 14px; top: 4px;
+  }
+  .tldr strong { font-weight: 700; }
+
+  /* SECTIONS */
+  .section { padding: 50px 0 10px; }
+  .sec-head {
+    display: flex; align-items: baseline; gap: 16px;
+    border-bottom: 2px solid var(--ink); padding-bottom: 14px; margin-bottom: 30px;
+  }
+  .sec-num {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    font-size: 15px; letter-spacing: 0.1em;
+    padding: 4px 11px; border-radius: 999px; color: var(--stage);
+  }
+  .s1 .sec-num { background: var(--sec1); }
+  .s2 .sec-num { background: var(--sec2); }
+  .s3 .sec-num { background: var(--sec3); }
+  .s4 .sec-num { background: var(--sec4); }
+  .sec-head h2 {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    font-size: clamp(22px, 4vw, 30px); letter-spacing: -0.01em;
+  }
+  .sec-head .en { color: var(--muted); font-weight: 400; font-size: 15px; margin-left: 2px; }
+
+  .cards { display: grid; gap: 14px; }
+  .tip {
+    background: #fff; border: 1px solid var(--line); border-radius: 14px;
+    padding: 20px 22px; display: flex; gap: 18px;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+  .tip:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(20,17,15,0.08); }
+  .s1 .tip:hover { border-color: var(--sec1); }
+  .s2 .tip:hover { border-color: var(--sec2); }
+  .s3 .tip:hover { border-color: var(--sec3); }
+  .s4 .tip:hover { border-color: var(--sec4); }
+  .n {
+    flex: 0 0 auto; width: 40px; height: 40px; border-radius: 10px;
+    display: grid; place-items: center;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 17px;
+    background: var(--paper); color: var(--ink);
+  }
+  .s1 .n { color: var(--sec1); } .s2 .n { color: #b8932a; }
+  .s3 .n { color: #2f8b85; } .s4 .n { color: #8d54c9; }
+  .tip-body h3 { font-size: 16.5px; font-weight: 600; margin-bottom: 4px; }
+  .tip-body p { font-size: 14.5px; color: var(--muted); }
+  .tip-body ul { margin: 10px 0 0; padding-left: 18px; }
+  .tip-body ul li { font-size: 13.5px; color: var(--muted); margin-bottom: 4px; }
+  .tip-body .ex {
+    display: inline-block; margin-top: 9px; font-size: 12px;
+    font-family: 'Space Grotesk', sans-serif; letter-spacing: 0.04em;
+    color: var(--ink); background: var(--spot-soft);
+    padding: 2px 9px; border-radius: 6px;
+  }
+
+  /* KICKER */
+  .kicker { margin: 60px 0 0; }
+  .kicker-inner {
+    background: var(--stage); color: var(--paper); border-radius: 18px;
+    padding: 40px 38px; text-align: center;
+  }
+  .kicker-inner p.q {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    font-size: clamp(22px, 4.5vw, 34px); line-height: 1.2; letter-spacing: -0.01em;
+  }
+  .kicker-inner p.q .glow { color: var(--spot); }
+  .kicker-inner p.sub { margin-top: 14px; color: #b7afa0; font-size: 15px; }
+
+  footer { padding: 44px 0 70px; text-align: center; color: var(--muted); font-size: 13px; }
+  footer a { color: var(--ink); }
+
+  @media (max-width: 560px) {
+    .tip { padding: 16px; gap: 14px; }
+    .n { width: 34px; height: 34px; font-size: 15px; }
+    .hero { padding: 64px 0 56px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">The art of the demo</div>
+    <h1>S-tier 데모를<br>만드는 <span class="glow">24가지</span> 팁</h1>
+    <p class="lede">빌더가 가장 약하지만 임팩트는 가장 큰 무대 — 발표보다 제작을 좋아하는 사람을 위한 데모 치트시트.</p>
+    <p class="meta">출처 · <a href="https://newsletter.posthog.com/p/how-to-demo">PostHog — How to demo</a> &nbsp;|&nbsp; <a href="https://news.hada.io/topic?id=30265">GeekNews</a></p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="tldr">
+    <h2>한눈에 보기</h2>
+    <ul>
+      <li>데모는 출시 여부와 투자 성패를 가르는 <strong>결정적 요소</strong>다.</li>
+      <li>기억시킬 <strong>단 하나의 메시지</strong>를 정하고 모든 요소를 거기 집중시킨다.</li>
+      <li>제품 둘러보기가 아니라 <strong>피치(pitch)</strong>로 접근한다.</li>
+      <li>공통의 불편함 &rarr; "you" 화법 &rarr; 비교 시연 &rarr; 에너지·실데이터·재미로 <strong>능동적 데모</strong> 완성.</li>
+    </ul>
+  </section>
+
+  <section class="section s1">
+    <div class="sec-head"><span class="sec-num">01</span><h2>기본 구조 <span class="en">The basic structure</span></h2></div>
+    <div class="cards">
+      <div class="tip"><div class="n">1</div><div class="tip-body"><h3>핵심 메시지 하나에 모든 걸 건다</h3><p>기억시킬 하나의 메시지를 정하고 데모의 모든 요소를 그 주위로 배치. 보통 "어떤 문제를 어떻게 푸는가"가 핵심.</p></div></div>
+      <div class="tip"><div class="n">2</div><div class="tip-body"><h3>핵심으로 최대한 빨리 진입</h3><p>아이디어 배경 설명은 불필요. 맥락이 필요해도 1~2문장으로 제한한다.</p></div></div>
+      <div class="tip"><div class="n">3</div><div class="tip-body"><h3>둘러보기가 아니라 피치다</h3><p>목표는 결과물 과시가 아니라 청중을 흥분시키는 것.</p></div></div>
+      <div class="tip"><div class="n">4</div><div class="tip-body"><h3>행동 가능한 마무리로 끝낸다</h3><p>QR 코드, 기여자 모집, 질문 유도 같은 직접적인 CTA로 종료.</p>
+        <ul><li>마지막 슬라이드에 전화번호를 띄운 팀</li><li>데모 전에 이미 "사용자 25% 배포 완료"를 발표 &rarr; 큰 wow</li></ul></div></div>
+    </div>
+  </section>
+
+  <section class="section s2">
+    <div class="sec-head"><span class="sec-num">02</span><h2>스토리텔링 전술 <span class="en">Storytelling tactics</span></h2></div>
+    <div class="cards">
+      <div class="tip"><div class="n">5</div><div class="tip-body"><h3>공통의 불편함으로 시작</h3><p>청중 전원이 공감하는 고통 지점에서 출발한다.</p><span class="ex">혼란스러운 Figma에서 특정 고슴도치 찾기 &rarr; 전원 손 듦</span></div></div>
+      <div class="tip"><div class="n">6</div><div class="tip-body"><h3>익숙한 개념을 빌린다</h3><p>새 개념은 아는 것에 빗대어 설명. "PostHog 안의 Cowork" &rarr; "PostHog Work".</p></div></div>
+      <div class="tip"><div class="n">7</div><div class="tip-body"><h3>별도의 데모 앱을 만든다</h3><p>특히 개발 도구는 추상적. 가짜 앱 위에서 보여줘야 이해된다.</p><span class="ex">UI 테스트 에이전트 &rarr; "OnlyHogs" 데모 앱에서 시연</span></div></div>
+      <div class="tip"><div class="n">8</div><div class="tip-body"><h3>"you" 화법으로 관점 이동</h3><p>"앱을 만들었다" 대신 "당신이 온콜 상태에서 장애 6건을 동시에 처리한다고 상상하라".</p></div></div>
+      <div class="tip"><div class="n">9</div><div class="tip-body"><h3>대안과 나란히 비교</h3><p>고통스러운 6단계 기존 방식 vs 1단계 버전을 함께 보여 비교 기준을 제공.</p></div></div>
+      <div class="tip"><div class="n">10</div><div class="tip-body"><h3>작동 원리는 나중에</h3><p>마술사는 트릭을 먼저 공개하지 않는다. 설명 영상·블로그 링크는 좋은 마무리 CTA.</p></div></div>
+    </div>
+  </section>
+
+  <section class="section s3">
+    <div class="sec-head"><span class="sec-num">03</span><h2>준비와 전달 <span class="en">Setup &amp; delivery</span></h2></div>
+    <div class="cards">
+      <div class="tip"><div class="n">11</div><div class="tip-body"><h3>Steve Ballmer처럼 에너지를</h3><p>훌륭한 데모는 종종 에너지 넘치는 사람의 "괜찮은" 데모일 뿐이다.</p></div></div>
+      <div class="tip"><div class="n">12</div><div class="tip-body"><h3>사과 금지</h3><p>"아직 거칠어서 죄송"은 보여주기도 전에 기대치를 낮춘다. 그냥 시작.</p></div></div>
+      <div class="tip"><div class="n">13</div><div class="tip-body"><h3>끝났음을 명확히 표시</h3><p>마무리 문장·하강 억양·축하 시각자료로 박수 타이밍의 어색함을 막는다.</p></div></div>
+      <div class="tip"><div class="n">14</div><div class="tip-body"><h3>데모 신을 위한 셋업 체크리스트</h3>
+        <ul><li>실계정 대신 데모 프로젝트 사용</li><li>노트북 알림 끄기, 휴대폰 무음</li><li>데모 URL은 북마크 (즉석 입력 금지)</li><li>WiFi 장애 대비 백업 스크린샷</li><li>브라우저 125~150% 확대 (뒷줄 가독성)</li><li>도착 전 프로젝터 테스트</li></ul></div></div>
+      <div class="tip"><div class="n">15</div><div class="tip-body"><h3>가능한 한 실데이터</h3><p>명백한 가짜 데이터는 초라해 보인다.</p><span class="ex">가격·배송 정보를 채운 진짜 같은 사이트로 연출</span></div></div>
+      <div class="tip"><div class="n">16</div><div class="tip-body"><h3>최대한 사전 로드·캐싱</h3><p>TV 요리사가 재료를 미리 준비하듯. 느린 에이전트 응답·쿼리·빌드의 데드타임 제거.</p></div></div>
+      <div class="tip"><div class="n">17</div><div class="tip-body"><h3>최소 한 번은 소리 내어 연습</h3><p>자신감이 자연스러운 전달로 이어진다.</p></div></div>
+      <div class="tip"><div class="n">18</div><div class="tip-body"><h3>완벽주의가 막지 않게</h3><p>데모는 원래 미완성 작업을 위한 것. 진행 중인 것도 보여준다.</p></div></div>
+    </div>
+  </section>
+
+  <section class="section s4">
+    <div class="sec-head"><span class="sec-num">04</span><h2>재미있게 만들기 <span class="en">Make it fun</span></h2></div>
+    <div class="cards">
+      <div class="tip"><div class="n">19</div><div class="tip-body"><h3>평범한 코드 노출 회피</h3><p>UI가 없어도 변명 안 됨. 아키텍처 다이어그램은 수초 만에 생성 가능.</p></div></div>
+      <div class="tip"><div class="n">20</div><div class="tip-body"><h3>평범한 슬라이드만 보여주지 말 것</h3><p>능동적 데모가 항상 이긴다. 핵심은 직접 만들어 <em>보여주는</em> 것.</p></div></div>
+      <div class="tip"><div class="n">21</div><div class="tip-body"><h3>녹화는 Screen Studio 급으로</h3><p>기본 녹화 도구는 부실. 확대·애니메이션을 더하는 앱을 쓴다.</p></div></div>
+      <div class="tip"><div class="n">22</div><div class="tip-body"><h3>예쁠 필요는 없다</h3><p>중요한 부분만 강조하면 됨. 단순한 그래픽이라도 각 콜아웃이 정보를 준다.</p></div></div>
+      <div class="tip"><div class="n">23</div><div class="tip-body"><h3>오디오는 과소평가됨</h3><p>한 팀은 sea shanty 보이스오버를, 다른 팀은 데모를 완전 오디오 전용으로 제작.</p></div></div>
+      <div class="tip"><div class="n">24</div><div class="tip-body"><h3>더 기이하게 (Do more weird)</h3><p>요청받지 않은 피냐 콜라다 영상을 배경에 깐 팀의 데모가 가장 기억에 남았다.</p></div></div>
+    </div>
+  </section>
+
+  <section class="kicker">
+    <div class="kicker-inner">
+      <p class="q">"<span class="glow">Active demo</span> always wins."</p>
+      <p class="sub">24개를 관통하는 한 문장 — 말하지 말고, 만들어서 보여줘라.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  정리 2026.6.16 · 원문 <a href="https://newsletter.posthog.com/p/how-to-demo">PostHog</a>
+</footer>
+
+</body>
+</html>
