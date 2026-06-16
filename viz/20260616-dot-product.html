@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2장 · 내적과 코사인 유사도</title>
+<style>
+  :root {
+    --ink: #1a2238;
+    --ink-soft: #4a5578;
+    --paper: #fbfaf6;
+    --line: #e3ddcf;
+    --A: #185fa5;
+    --B: #d85a30;
+    --B-deep: #993c1d;
+    --leaf: #4a9d6e;
+    --aha: #f6f1e3;
+    --aha-edge: #e8b04b;
+    --box: #eef2f8;
+    --box-edge: #cdd9ec;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Malgun Gothic", sans-serif;
+    line-height: 1.85; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 22px 120px; }
+  header { padding: 70px 0 44px; border-bottom: 2px solid var(--ink); margin-bottom: 50px; }
+  .eyebrow { font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--B); font-weight: 700; margin-bottom: 18px; }
+  h1 { font-size: clamp(32px, 6.5vw, 50px); line-height: 1.15; margin: 0 0 18px; letter-spacing: -0.02em; font-weight: 800; }
+  .sub { font-size: 17px; color: var(--ink-soft); margin: 0; }
+  .meta { margin-top: 26px; font-size: 13px; color: var(--ink-soft); display: flex; gap: 18px; flex-wrap: wrap; }
+  .meta span { display: inline-flex; align-items: center; gap: 6px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--leaf); }
+  h2 { font-size: 27px; margin: 64px 0 8px; letter-spacing: -0.01em; font-weight: 800; display: flex; align-items: baseline; gap: 12px; }
+  h2 .num { font-size: 15px; color: var(--B); font-weight: 700; border: 1.5px solid var(--B); border-radius: 50%; width: 30px; height: 30px; min-width: 30px; display: inline-flex; align-items: center; justify-content: center; line-height: 1; }
+  h3 { font-size: 19px; margin: 38px 0 6px; font-weight: 700; }
+  p { margin: 14px 0; font-size: 16.5px; }
+  .lead { font-size: 18px; color: var(--ink-soft); }
+  .calc { text-align: center; font-size: 19px; margin: 22px 0; font-family: "SF Mono", ui-monospace, Menlo, monospace; color: var(--ink); }
+  .calc b { color: var(--B-deep); }
+  .fig { margin: 30px 0; padding: 26px 20px; background: #fff; border: 1px solid var(--line); border-radius: 14px; text-align: center; }
+  .fig svg { max-width: 100%; height: auto; }
+  .fig figcaption { margin-top: 14px; font-size: 13.5px; color: var(--ink-soft); line-height: 1.6; }
+  .aha { margin: 34px 0; padding: 22px 24px; background: var(--aha); border-left: 5px solid var(--aha-edge); border-radius: 0 12px 12px 0; }
+  .aha .tag { font-size: 12px; font-weight: 800; letter-spacing: 0.12em; color: #b07d18; text-transform: uppercase; margin-bottom: 8px; }
+  .aha p { margin: 6px 0; font-size: 16px; }
+  .summary { margin: 34px 0; padding: 4px 26px 22px; background: var(--box); border: 1px solid var(--box-edge); border-radius: 14px; }
+  .summary h4 { font-size: 15px; letter-spacing: 0.05em; color: var(--A); margin: 22px 0 6px; font-weight: 800; }
+  .summary ul { margin: 0; padding-left: 20px; }
+  .summary li { margin: 9px 0; font-size: 15.5px; }
+  .quote { margin: 44px 0; padding: 30px 28px; text-align: center; background: var(--ink); color: var(--paper); border-radius: 16px; }
+  .quote .q { font-size: 21px; font-weight: 800; letter-spacing: -0.01em; line-height: 1.5; }
+  .quote .by { margin-top: 12px; font-size: 13px; color: #aeb8d4; letter-spacing: 0.05em; }
+  .you { background: #f0f7f2; border: 1px solid #cfe6d8; border-radius: 12px; padding: 16px 20px; margin: 22px 0; font-size: 15.5px; }
+  .you b { color: var(--leaf); }
+  .signbox { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 26px 0; }
+  .sign { display: flex; align-items: flex-start; gap: 14px; padding: 16px 18px; border-radius: 12px; border: 1px solid var(--line); background: #fff; }
+  .sign .badge { font-size: 22px; font-weight: 800; min-width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+  .sign.pos .badge { background: #e9f3ec; color: #2f7d4f; }
+  .sign.zero .badge { background: #eef2f8; color: #4a5578; }
+  .sign.neg .badge { background: #faecea; color: #b23b22; }
+  .sign .body { font-size: 15.5px; }
+  .sign .body b { font-size: 16px; }
+  strong { font-weight: 700; }
+  .hl { background: linear-gradient(transparent 58%, #ffe7a0 58%); padding: 0 2px; }
+  footer { margin-top: 70px; padding-top: 26px; border-top: 1px solid var(--line); font-size: 13px; color: var(--ink-soft); text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">수학적 직관 다지기 · Chapter 2</div>
+    <h1>내적과 코사인 유사도</h1>
+    <p class="sub">— "방향이 같은가"를 숫자로 재는 법, 그리고 그림자의 정체</p>
+    <div class="meta">
+      <span><span class="dot"></span> 눈높이: 고1 ~ 고2</span>
+      <span><span class="dot"></span> 키워드: 내적 · 정사영 · 코사인 유사도</span>
+    </div>
+  </header>
+
+  <p class="lead">1장에서 단어를 벡터(화살표)로 바꿨다. 이제 진짜 궁금한 건 이것이다 — 컴퓨터는 눈이 없는데, 숫자만 보고 "이 두 화살표가 같은 방향인가, 반대인가"를 어떻게 알아낼까? 이 질문을 따라가면 내적(dot product)에 도착한다.</p>
+
+  <!-- 1 -->
+  <h2><span class="num">1</span> 뺄셈은 방향이 아니라 거리를 잰다</h2>
+  <p>첫 시도: 두 화살표의 좌표를 빼본다. A=(3,8), B=(2,7)이면 (1,1)로 차이가 작다 → "비슷하다". 그럴듯하다. 하지만 함정이 있다.</p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg">
+      <line x1="50" y1="270" x2="50" y2="30" stroke="#1a2238" stroke-width="1" opacity="0.4"/>
+      <line x1="50" y1="270" x2="530" y2="270" stroke="#1a2238" stroke-width="1" opacity="0.4"/>
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5"/></marker>
+      </defs>
+      <!-- A short -->
+      <line x1="50" y1="270" x2="140" y2="180" stroke="#d85a30" stroke-width="3" marker-end="url(#ah)"/>
+      <text x="148" y="178" font-size="13" font-weight="700" fill="#993c1d">A=(3,8)</text>
+      <!-- D long, same direction -->
+      <line x1="50" y1="270" x2="500" y2="45" stroke="#d85a30" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.55" marker-end="url(#ah)"/>
+      <text x="380" y="55" font-size="12.5" fill="#993c1d">D=(30,80) · 같은 방향, 10배 길다</text>
+      <!-- distance dashed -->
+      <line x1="140" y1="180" x2="500" y2="45" stroke="#993c1d" stroke-width="1" stroke-dasharray="3 3" opacity="0.6"/>
+      <text x="300" y="100" font-size="12" fill="#993c1d">끝점 거리: 멀다 (방향은 같은데!)</text>
+    </svg>
+    <figcaption>A와 D는 방향이 완전히 같다(D가 10배 길 뿐). 그런데 끝점 사이 거리는 멀다. 뺄셈은 "끝점이 가까운가(거리)"를 잴 뿐, "방향이 같은가"를 못 잡는다. 즉 벡터를 <strong>점</strong>으로 본 것이다.</figcaption>
+  </figure>
+
+  <p>RAG에서 같은 의미인데 강조 정도만 다른 문장들은 딱 이 A·D 관계다 — 방향은 같고 길이만 다르다. 그래서 거리(뺄셈)로 보면 "다르다"고 잘못 판단한다. 우리가 원하는 건 <span class="hl">거리가 아니라 방향</span>이다.</p>
+
+  <!-- 2 -->
+  <h2><span class="num">2</span> 기울기도 답이 아니다</h2>
+  <p>두 번째 시도: 기울기(y/x)를 본다. A=(3,8)은 8/3, D=(30,80)도 80/30=8/3 → 같다. 방향이 같으면 기울기도 같으니 그럴듯하다. 하지만 두 가지가 막는다.</p>
+  <div class="you">
+    <b>기울기의 한계 ①</b> — 정반대를 구분 못 한다. A=(3,8)의 기울기 8/3, 정반대인 C=(-3,-8)의 기울기도 (-8)/(-3)=8/3. 같은 의미와 반대 의미가 똑같이 나와버린다.<br>
+    <b>기울기의 한계 ②</b> — 차원이 늘면 정의가 안 된다. 기울기는 숫자 2개일 때만 "하나의 비율"이 된다. 1536차원에서 "기울기"는 무엇인가? 정의 불가. (1장의 약속 "차원이 늘어도 같은 규칙"을 못 지킨다.)
+  </div>
+
+  <!-- 3 -->
+  <h2><span class="num">3</span> 내적 — 자리수끼리 곱해서 더한다</h2>
+  <p>세 번째 시도가 정답이다. 빼지도, 나누지도 말고 — <strong>같은 자리수끼리 곱해서, 그 결과를 전부 더한다.</strong></p>
+  <div class="calc">
+    A · B = 3×2 + 8×7 = 6 + 56 = <b>62</b> &nbsp;(양수)<br>
+    A · C = 3×(−3) + 8×(−8) = −9 + (−64) = <b>−73</b> &nbsp;(음수)
+  </div>
+  <p>이것이 <strong>내적(dot product)</strong>이다. 그리고 기울기가 못 하던 일을 단번에 해낸다 — 같은 방향이면 <span class="hl">양수</span>, 반대 방향이면 <span class="hl">음수</span>. 부호 하나로 같은 의미와 반대 의미가 갈린다.</p>
+
+  <div class="aha">
+    <div class="tag">차원 문제도 자동 해결</div>
+    <p>2차원: x·x + y·y (항 2개) · 3차원: x·x + y·y + z·z (항 3개) · 1536차원: 1536쌍을 곱해서 다 더하기.</p>
+    <p>규칙이 한 글자도 안 바뀐다. 곱해서 더하는 쌍의 개수만 늘 뿐. <strong>"차원이 늘어도 계산 규칙은 똑같다. 안 보일 뿐이다."</strong></p>
+  </div>
+
+  <!-- 4 -->
+  <h2><span class="num">4</span> 왜 하필 "곱해서 더하기"가 방향을 잡을까</h2>
+  <p>여기서 멈추면 안 된다. 우리가 원한 건 "방향"인데, 한 일은 그냥 "곱해서 더하기"라는 산수다. 이 무미건조한 계산이 <strong>왜</strong> 방향을 잡아낼까? 우연이 아니다. 답은 <span class="hl">그림자(정사영, projection)</span>에 있다.</p>
+
+  <p>가장 단순한 경우부터. 순수하게 오른쪽인 화살표 (1,0)과 순수하게 위쪽인 (0,1). 둘은 직각이다. 내적하면 1×0 + 0×1 = <strong>0</strong>. 왜? <strong>"오른쪽" 화살표 안에는 "위쪽" 성분이 0만큼밖에 없기 때문</strong>이다. 공유하는 방향이 전혀 없으니 0.</p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 580 320" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="ah2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5"/></marker>
+      </defs>
+      <line x1="60" y1="250" x2="60" y2="40" stroke="#1a2238" stroke-width="1" opacity="0.35"/>
+      <line x1="60" y1="250" x2="540" y2="250" stroke="#1a2238" stroke-width="1" opacity="0.35"/>
+      <circle cx="60" cy="250" r="3" fill="#1a2238"/>
+      <text x="50" y="268" font-size="11.5" fill="#4a5578" text-anchor="end">원점</text>
+      <!-- A baseline -->
+      <line x1="60" y1="250" x2="380" y2="250" stroke="#185fa5" stroke-width="3" marker-end="url(#ah2)"/>
+      <text x="250" y="272" font-size="13" font-weight="700" fill="#185fa5">A (기준 방향)</text>
+      <!-- B up-right -->
+      <line x1="60" y1="250" x2="280" y2="90" stroke="#d85a30" stroke-width="3" marker-end="url(#ah2)"/>
+      <text x="210" y="85" font-size="13" font-weight="700" fill="#993c1d">B</text>
+      <!-- drop line -->
+      <line x1="280" y1="90" x2="280" y2="250" stroke="#993c1d" stroke-width="1" stroke-dasharray="5 4" opacity="0.7"/>
+      <text x="292" y="170" font-size="11" fill="#993c1d">빛을 위에서 비추면…</text>
+      <!-- shadow -->
+      <line x1="60" y1="258" x2="280" y2="258" stroke="#993c1d" stroke-width="5" opacity="0.85"/>
+      <text x="170" y="290" font-size="12.5" font-weight="700" fill="#993c1d" text-anchor="middle">B가 A 위에 드리운 그림자 (양수)</text>
+    </svg>
+    <figcaption>B 위에서 똑바로 빛을 비추면 기준 화살표 A 위에 그림자가 생긴다. 그 그림자 길이 = "B 안에 A 방향 성분이 얼마나 들어있나". 내적은 사실 이 그림자 길이(×A의 길이)를 재는 것이다. "곱해서 더하기"는 이 그림자를 구하는 지름길일 뿐이다.</figcaption>
+  </figure>
+
+  <h3>이제 부호 세 가지가 전부 풀린다</h3>
+  <div class="signbox">
+    <div class="sign pos">
+      <div class="badge">+</div>
+      <div class="body"><b>양수 — 비슷한 방향</b><br>B가 A와 비슷한 쪽을 보면 그림자가 A가 가리키는 방향으로 드리운다. 공유하는 방향이 많다 = 비슷한 의미.</div>
+    </div>
+    <div class="sign zero">
+      <div class="badge">0</div>
+      <div class="body"><b>0 — 직각, 무관</b><br>B가 A와 직각이면 A 방향으로 누른 그림자가 점으로 찌부러진다. 길이 0. (1,0)·(0,1)=0이 이것. 공유하는 방향이 없다 = 무관한 의미.</div>
+    </div>
+    <div class="sign neg">
+      <div class="badge">−</div>
+      <div class="body"><b>음수 — 반대 방향</b><br>B가 A와 반대쪽을 보면 그림자가 A가 가리키는 방향의 <em>반대편</em>으로 드리운다. A·C=−73이 이것. 정반대로 공유한다 = 반대 의미.</div>
+    </div>
+  </div>
+
+  <div class="aha">
+    <div class="tag">직각의 진짜 기준</div>
+    <p><strong>내적이 0이면 직각이다.</strong> 좌표에 0이 들어있느냐와는 무관하다 — 예) (2,1)·(−1,2)=−2+2=0, 좌표에 0이 없어도 직각.</p>
+    <p>2·3차원에서 "내적 0"과 "눈에 보이는 90도"가 항상 일치함을 확인했으므로, 그릴 수 없는 1536차원에서는 <strong>"내적이 0인 상태"를 직각의 정의로 삼는다.</strong> 보이는 데서 검증한 규칙을 안 보이는 데로 확장하는 것.</p>
+  </div>
+
+  <div class="you">
+    <b>영준님의 통찰</b> — "한쪽 컬럼이 0이면, 아무리 다른 쪽이 커도 그 자리는 상관이 없어진다." 정확하다. 곱할 때 ×0=0이라 그 의미 축은 닮음 판정에 기여하지 못한다. 각 자리(컬럼)마다 "이 의미 축에서 둘이 같은 쪽인가"를 따져 전부 합산한 것이 내적이다.
+  </div>
+
+  <!-- 5 -->
+  <h2><span class="num">5</span> 코사인 유사도 — 길이를 빼고 방향만</h2>
+  <p>내적값에는 사실 두 가지가 섞여 있다. ① 방향이 얼마나 같은가, ② 두 화살표가 얼마나 긴가. A=(3,8)과 D=(30,80)은 방향이 같은데 D가 길어서 내적값이 10배 커진다. 값이 큰 게 방향 때문인지 길이 때문인지 헷갈린다.</p>
+  <p><strong>코사인 유사도</strong>는 여기서 딱 한 가지만 더 한다 — 각 화살표의 길이로 나눠서 <span class="hl">길이라는 잡음을 제거하고, 순수하게 방향(각도)만</span> 남긴다. 그래서 결과가 항상 −1 ~ +1 사이로 깔끔하게 떨어진다.</p>
+
+  <div class="aha">
+    <div class="tag">RAG와 연결</div>
+    <p>−1 (정반대) ··· 0 (직각·무관) ··· +1 (완전히 같은 방향). 영준님이 RAG에서 보는 "유사도 0.87"은 <strong>"길이 빼고 순수하게 방향만 봤을 때 87%쯤 같은 쪽을 본다"</strong>는 뜻이다. 길이가 3이든 3000이든 방향만 같으면 +1.</p>
+  </div>
+
+  <div class="quote">
+    <div class="q">내적 = 방향+길이가 섞인 그림자.<br>코사인 유사도 = 거기서 길이를 빼고 방향(각도)만 남긴 것.</div>
+    <div class="by">— 2장 한 줄 요약 (영준님 정리 그대로)</div>
+  </div>
+
+  <!-- summary -->
+  <div class="summary">
+    <h4>이번 장 한눈에 정리</h4>
+    <ul>
+      <li><strong>뺄셈은 거리를 잰다 — 방향이 아니다.</strong> 같은 방향이라도 길이가 다르면 끝점이 멀어져 "다르다"고 잘못 본다.</li>
+      <li><strong>기울기도 안 된다.</strong> 정반대를 구분 못 하고(8/3 = 8/3), 고차원에서 정의가 안 된다.</li>
+      <li><strong>내적 = 같은 자리수끼리 곱해서 전부 더하기.</strong> 양수=같은 방향, 0=직각/무관, 음수=반대 방향. 차원이 몇 개든 같은 규칙.</li>
+      <li><strong>내적이 0이면 직각.</strong> 좌표에 0이 있냐와 무관하게 내적값만 본다. 고차원에선 "내적 0"이 직각의 정의 그 자체.</li>
+      <li><strong>내적의 정체는 그림자(정사영).</strong> "B를 A 방향으로 눌렀을 때 A 쪽으로 얼마나 뻗어있나". 곱해서 더하기는 그 그림자를 구하는 지름길.</li>
+      <li><strong>코사인 유사도 = 내적에서 길이 영향을 제거한 것.</strong> 순수 방향만 남겨 −1 ~ +1로 정규화. RAG 유사도 점수의 정체.</li>
+    </ul>
+  </div>
+
+  <h3>다음 장 예고</h3>
+  <p>지금까지 벡터 하나, 벡터 둘 사이의 관계(내적)를 봤다. 다음은 <strong>여러 벡터를 한꺼번에 변형하는 장치 — 행렬(matrix)</strong>로 간다. 임베딩을 만들고, 어텐션에서 Q·K·V를 뽑아내는 그 연산의 정체다. (행렬은 중학교에서 맛보므로 다음 장은 눈높이를 살짝 낮춰 시작한다.)</p>
+
+  <footer>
+    수학적 직관 다지기 · Chapter 2 — 내적과 코사인 유사도<br>
+    뺄셈 → 기울기 → 내적으로 직접 부딪혀가며 도달한 개념. 그림자가 핵심이다.
+  </footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1장 · 벡터란 무엇인가</title>
+<style>
+  :root {
+    --ink: #1a2238;
+    --ink-soft: #4a5578;
+    --paper: #fbfaf6;
+    --line: #e3ddcf;
+    --apple: #e2574c;
+    --banana: #f2b134;
+    --car: #3d6fb4;
+    --leaf: #4a9d6e;
+    --aha: #f6f1e3;
+    --aha-edge: #e8b04b;
+    --box: #eef2f8;
+    --box-edge: #cdd9ec;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Malgun Gothic", sans-serif;
+    line-height: 1.85;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 22px 120px; }
+
+  /* header */
+  header {
+    padding: 70px 0 44px;
+    border-bottom: 2px solid var(--ink);
+    margin-bottom: 50px;
+  }
+  .eyebrow {
+    font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--apple); font-weight: 700; margin-bottom: 18px;
+  }
+  h1 {
+    font-size: clamp(34px, 7vw, 52px); line-height: 1.15; margin: 0 0 18px;
+    letter-spacing: -0.02em; font-weight: 800;
+  }
+  .sub { font-size: 17px; color: var(--ink-soft); margin: 0; }
+  .meta {
+    margin-top: 26px; font-size: 13px; color: var(--ink-soft);
+    display: flex; gap: 18px; flex-wrap: wrap;
+  }
+  .meta span { display: inline-flex; align-items: center; gap: 6px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--leaf); }
+
+  h2 {
+    font-size: 27px; margin: 64px 0 8px; letter-spacing: -0.01em; font-weight: 800;
+    display: flex; align-items: baseline; gap: 12px;
+  }
+  h2 .num {
+    font-size: 15px; color: var(--apple); font-weight: 700;
+    border: 1.5px solid var(--apple); border-radius: 50%;
+    width: 30px; height: 30px; min-width: 30px; display: inline-flex;
+    align-items: center; justify-content: center; line-height: 1;
+  }
+  h3 { font-size: 19px; margin: 38px 0 6px; font-weight: 700; }
+  p { margin: 14px 0; font-size: 16.5px; }
+  .lead { font-size: 18px; color: var(--ink-soft); }
+
+  .fig {
+    margin: 30px 0; padding: 26px 20px; background: #fff;
+    border: 1px solid var(--line); border-radius: 14px; text-align: center;
+  }
+  .fig svg { max-width: 100%; height: auto; }
+  .fig figcaption {
+    margin-top: 14px; font-size: 13.5px; color: var(--ink-soft); line-height: 1.6;
+  }
+
+  .aha {
+    margin: 34px 0; padding: 22px 24px; background: var(--aha);
+    border-left: 5px solid var(--aha-edge); border-radius: 0 12px 12px 0;
+  }
+  .aha .tag {
+    font-size: 12px; font-weight: 800; letter-spacing: 0.12em;
+    color: #b07d18; text-transform: uppercase; margin-bottom: 8px;
+  }
+  .aha p { margin: 6px 0; font-size: 16px; }
+
+  .summary {
+    margin: 34px 0; padding: 4px 26px 22px; background: var(--box);
+    border: 1px solid var(--box-edge); border-radius: 14px;
+  }
+  .summary h4 {
+    font-size: 15px; letter-spacing: 0.05em; color: var(--car);
+    margin: 22px 0 6px; font-weight: 800;
+  }
+  .summary ul { margin: 0; padding-left: 20px; }
+  .summary li { margin: 9px 0; font-size: 15.5px; }
+
+  .quote {
+    margin: 44px 0; padding: 30px 28px; text-align: center;
+    background: var(--ink); color: var(--paper); border-radius: 16px;
+  }
+  .quote .q { font-size: 22px; font-weight: 800; letter-spacing: -0.01em; line-height: 1.5; }
+  .quote .by { margin-top: 12px; font-size: 13px; color: #aeb8d4; letter-spacing: 0.05em; }
+
+  .you {
+    background: #f0f7f2; border: 1px solid #cfe6d8; border-radius: 12px;
+    padding: 16px 20px; margin: 22px 0; font-size: 15.5px;
+  }
+  .you b { color: var(--leaf); }
+
+  strong { font-weight: 700; }
+  .hl { background: linear-gradient(transparent 58%, #ffe7a0 58%); padding: 0 2px; }
+
+  footer {
+    margin-top: 70px; padding-top: 26px; border-top: 1px solid var(--line);
+    font-size: 13px; color: var(--ink-soft); text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">수학적 직관 다지기 · Chapter 1</div>
+    <h1>벡터란 무엇인가</h1>
+    <p class="sub">— 의미를 숫자로 바꾸는 법, 그리고 보이지 않는 차원을 믿는 법</p>
+    <div class="meta">
+      <span><span class="dot"></span> 눈높이: 중3 ~ 고1</span>
+      <span><span class="dot"></span> 키워드: 벡터 · 차원 · 임베딩</span>
+    </div>
+  </header>
+
+  <p class="lead">우리는 "컴퓨터는 단어를 어떻게 이해할까?"라는 질문에서 출발했다. 컴퓨터는 글자를 모른다. 컴퓨터가 아는 건 오직 숫자뿐이다. 그래서 단어의 <strong>의미</strong>를 숫자로 바꿔 쥐여줘야 한다. 이 한 가지 고민을 끝까지 따라가다 보면, 우리는 자연스럽게 '벡터'라는 개념에 도착하게 된다.</p>
+
+  <!-- 1 -->
+  <h2><span class="num">1</span> 숫자 하나로는 부족하다</h2>
+  <p>가장 단순한 생각부터 해보자. 단어마다 번호를 하나씩 붙이는 것이다.</p>
+  <p style="text-align:center; font-size:18px;">사과 = 1 &nbsp;&nbsp; 바나나 = 2 &nbsp;&nbsp; 자동차 = 3</p>
+  <p>구분은 된다. 하지만 숫자에는 우리가 의도하지 않은 <strong>함정</strong>이 숨어 있다. 숫자는 한 줄로 세우는 순간, 저절로 <span class="hl">순서</span>와 <span class="hl">거리</span>를 갖게 된다.</p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 560 150" xmlns="http://www.w3.org/2000/svg">
+      <line x1="40" y1="100" x2="520" y2="100" stroke="#1a2238" stroke-width="2"/>
+      <!-- ticks -->
+      <g font-size="13" fill="#4a5578" text-anchor="middle">
+        <line x1="140" y1="94" x2="140" y2="106" stroke="#1a2238" stroke-width="2"/>
+        <line x1="280" y1="94" x2="280" y2="106" stroke="#1a2238" stroke-width="2"/>
+        <line x1="420" y1="94" x2="420" y2="106" stroke="#1a2238" stroke-width="2"/>
+        <text x="140" y="125">1</text>
+        <text x="280" y="125">2</text>
+        <text x="420" y="125">3</text>
+      </g>
+      <circle cx="140" cy="100" r="9" fill="#e2574c"/>
+      <circle cx="280" cy="100" r="9" fill="#f2b134"/>
+      <circle cx="420" cy="100" r="9" fill="#3d6fb4"/>
+      <g font-size="14" font-weight="700" text-anchor="middle">
+        <text x="140" y="70" fill="#e2574c">사과</text>
+        <text x="280" y="70" fill="#c8901a">바나나</text>
+        <text x="420" y="70" fill="#3d6fb4">자동차</text>
+      </g>
+      <!-- distance brackets -->
+      <g stroke="#9aa3bd" stroke-width="1.4" fill="none">
+        <path d="M140 135 L140 142 L280 142 L280 135"/>
+        <path d="M280 135 L280 142 L420 142 L420 135"/>
+      </g>
+    </svg>
+    <figcaption>한 줄(1차원) 위에서는 바나나가 사과와 자동차 사이에 억지로 끼고, 두 간격이 똑같아진다. "바나나는 자동차만큼 사과에서 멀다"는 엉뚱한 관계가 강제로 생긴다.</figcaption>
+  </figure>
+
+  <p>사과와 바나나는 둘 다 과일이라 가까워야 하고, 자동차는 멀리 떨어져야 한다. 하지만 숫자 한 줄로는 이 관계를 표현할 <strong>자유가 없다</strong>. 줄 하나 위에서는 모든 것이 일렬로만 놓이기 때문이다.</p>
+
+  <!-- 2 -->
+  <h2><span class="num">2</span> 숫자를 여러 개 주면, 공간이 생긴다</h2>
+  <p>그렇다면 숫자를 하나가 아니라 <strong>두 개씩</strong> 주면 어떨까?</p>
+  <p style="text-align:center; font-size:18px;">사과 = (3, 8) &nbsp;&nbsp; 바나나 = (2, 7) &nbsp;&nbsp; 자동차 = (9, 1)</p>
+  <p>숫자가 두 개라는 건, 단어를 한 줄이 아니라 <span class="hl">평면(2차원)</span> 위에 점으로 찍을 수 있다는 뜻이다. 가로축 하나, 세로축 하나. 이제 사과와 바나나는 가까이, 자동차는 멀리 놓을 수 있다.</p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 420 320" xmlns="http://www.w3.org/2000/svg">
+      <!-- axes -->
+      <line x1="50" y1="280" x2="390" y2="280" stroke="#1a2238" stroke-width="2"/>
+      <line x1="50" y1="280" x2="50" y2="30" stroke="#1a2238" stroke-width="2"/>
+      <text x="385" y="305" font-size="12" fill="#4a5578" text-anchor="end">가로축 (예: 딱딱함)</text>
+      <text x="58" y="40" font-size="12" fill="#4a5578">세로축 (예: 크기)</text>
+      <!-- points: x scaled *35 +50, y = 280 - val*28 -->
+      <!-- apple (3,8) -->
+      <circle cx="155" cy="56" r="10" fill="#e2574c"/>
+      <text x="170" y="52" font-size="14" font-weight="700" fill="#e2574c">사과 (3,8)</text>
+      <!-- banana (2,7) -->
+      <circle cx="120" cy="84" r="10" fill="#f2b134"/>
+      <text x="135" y="100" font-size="14" font-weight="700" fill="#c8901a">바나나 (2,7)</text>
+      <!-- car (9,1) -->
+      <circle cx="365" cy="252" r="10" fill="#3d6fb4"/>
+      <text x="352" y="245" font-size="14" font-weight="700" fill="#3d6fb4" text-anchor="end">자동차 (9,1)</text>
+      <!-- closeness hint -->
+      <line x1="155" y1="56" x2="120" y2="84" stroke="#4a9d6e" stroke-width="1.6" stroke-dasharray="4 3"/>
+      <text x="100" y="60" font-size="11.5" fill="#4a9d6e">가깝다</text>
+    </svg>
+    <figcaption>숫자 두 개 = 평면 위의 한 점. 사과와 바나나는 가까이 모이고 자동차는 멀리 떨어진다. 1차원의 답답함이 풀렸다.</figcaption>
+  </figure>
+
+  <div class="you">
+    <b>영준님의 통찰 ①</b> — "축이 두 개면, 세상을 단 두 가지 기준으로만 나눠야 한다. 크기와 딱딱함만 쓰면 돌멩이·콘크리트·호두·밤이 전부 '작고 딱딱한' 한 자리에 뭉쳐버린다." 평면도 결국 부족하다는 걸 스스로 발견했다.
+  </div>
+
+  <!-- 3 -->
+  <h2><span class="num">3</span> 부족하면 축을 더 늘린다</h2>
+  <p>두 축으로 겹쳐버린다면? 답은 단순하다. <strong>세 번째 축</strong>을 추가한다. 예를 들어 "먹을 수 있는 정도"라는 축을 넣으면, 크기·딱딱함이 비슷했던 돌멩이와 밤이 위아래로 쫙 갈라진다.</p>
+
+  <figure class="fig">
+    <svg viewBox="0 0 420 300" xmlns="http://www.w3.org/2000/svg">
+      <!-- pseudo 3D axes -->
+      <line x1="60" y1="240" x2="330" y2="240" stroke="#1a2238" stroke-width="2"/>
+      <line x1="60" y1="240" x2="60" y2="40" stroke="#1a2238" stroke-width="2"/>
+      <line x1="60" y1="240" x2="160" y2="180" stroke="#1a2238" stroke-width="2"/>
+      <text x="325" y="262" font-size="11.5" fill="#4a5578" text-anchor="end">딱딱함 →</text>
+      <text x="66" y="50" font-size="11.5" fill="#4a5578">크기 ↑</text>
+      <text x="150" y="172" font-size="11.5" fill="#4a5578">먹을 수 있나 ↗</text>
+      <!-- stone: hard, small, NOT edible (low) -->
+      <circle cx="250" cy="225" r="9" fill="#7a8095"/>
+      <text x="262" y="228" font-size="13" font-weight="700" fill="#5a6075">돌멩이</text>
+      <!-- chestnut: hard, small, edible (lifted up via 3rd axis) -->
+      <circle cx="280" cy="120" r="9" fill="#9d6b3f"/>
+      <text x="292" y="123" font-size="13" font-weight="700" fill="#7d5430">밤</text>
+      <!-- dashed link showing they share 2D but split on 3rd -->
+      <line x1="250" y1="225" x2="280" y2="120" stroke="#e2574c" stroke-width="1.6" stroke-dasharray="4 3"/>
+      <text x="300" y="180" font-size="11.5" fill="#e2574c">3번째 축에서</text>
+      <text x="300" y="196" font-size="11.5" fill="#e2574c">갈라진다</text>
+    </svg>
+    <figcaption>평면에서 겹쳐 보이던 돌멩이와 밤이, 세 번째 축(먹을 수 있나)이 생기자 높이 차이로 분리된다. 축이 늘수록 더 미세한 의미 차이를 담을 수 있다.</figcaption>
+  </figure>
+
+  <p>그런데 곧 또 이런 생각이 든다. "기준이 크기·딱딱함·먹을 수 있나, 셋뿐일까? 색깔도, 살아있나 죽었나도, 비싼가 싼가도 있는데… 기준은 수백 개도 넘잖아."</p>
+  <p>맞다. 그래서 진짜 임베딩은 축이 2개도 3개도 아니라 <span class="hl">수백, 수천 개</span>다. 영준님이 RAG에서 쓰는 임베딩이 768차원, 1536차원, 3072차원인 이유가 바로 이것이다. 사람은 그림으로 못 그릴 뿐, 컴퓨터는 단어 하나를 수천 개 기준 위의 좌표로 들고 있다.</p>
+
+  <div class="you">
+    <b>영준님의 실무 경험</b> — 근로기준법을 1536차원으로 임베딩했을 때는 답이 잘 안 나오다가, 3072차원으로 늘리니 답변 품질이 좋아졌다. 이건 우리가 손으로 그려본 "축이 부족하면 의미가 뭉친다 → 축을 늘리면 갈라진다"는 원리가, 큰 스케일에서 그대로 일어난 것이다.
+  </div>
+
+  <!-- the definition -->
+  <h2><span class="num">4</span> 이게 바로 '벡터'다</h2>
+  <p>지금까지 우리가 한 일 — <strong>숫자를 순서대로 나열해서 어떤 공간 위의 한 점(또는 화살표)을 나타내는 것.</strong> 이것이 바로 벡터(vector)의 정의다.</p>
+
+  <div class="aha">
+    <div class="tag">핵심 정의</div>
+    <p><strong>벡터</strong> = 숫자를 순서대로 나열한 것. 그 숫자들이 공간 위의 위치(점)나 방향(화살표)을 가리킨다.</p>
+    <p>숫자가 <strong>몇 개</strong>냐 = <strong>몇 차원</strong> 벡터냐. &nbsp;(3,8) → 2차원 벡터 / 숫자 1536개 → 1536차원 벡터.</p>
+  </div>
+
+  <!-- 5: the believing part -->
+  <h2><span class="num">5</span> 보이지 않는 차원을 믿는 법</h2>
+  <p>여기서 가장 솔직하고 중요한 벽을 만난다. <strong>우리는 3차원까지밖에 그림으로 그릴 수 없다.</strong> 4차원, 1536차원은 아무리 애써도 머릿속에 떠오르지 않는다. 그래서 벡터가 글로는 이해돼도 마음으로는 잘 안 믿어진다. 사람은 보이는 건 더 믿고, 안 보이는 건 덜 믿으니까.</p>
+
+  <div class="aha">
+    <div class="tag">안심하세요</div>
+    <p>4차원 이상을 그림으로 못 그리는 건 <strong>지극히 정상</strong>이다. 머리가 부족해서가 아니라, 인간의 시각 자체가 3차원 세계에 맞춰 진화했기 때문이다. 평생 수학만 한 사람도 4차원을 "본" 적은 없다.</p>
+  </div>
+
+  <h3>그럼 수학자들은 어떻게 다룰까?</h3>
+  <p>그들도 그림으로는 안 그린다. 대신 <span class="hl">3차원에서 확실히 체득한 감각을 그대로 데려가서 믿는다.</span> 거리를 재는 법, 두 화살표가 같은 방향이면 닮았다는 느낌 — 이걸 2·3차원에서 몸에 새겨두고, 고차원에서는 "계산 규칙이 똑같으니 그 느낌도 똑같이 살아있다"고 믿는 것이다.</p>
+
+  <div class="quote">
+    <div class="q">"엑셀에서 컬럼이 3개든 1536개든,<br>계산하는 방식은 똑같다. 안 보일 뿐이다."</div>
+    <div class="by">— 이 코스의 표어 (영준님이 직접 찾아낸 비유)</div>
+  </div>
+
+  <p>컬럼 3개짜리 표는 머릿속에 그려지지만 1536개짜리는 안 그려진다. 그렇다고 그 표를 못 다루는가? 아니다. "각 컬럼끼리 빼서 제곱해 더한다" 같은 규칙은 컬럼이 몇 개든 똑같이 적용된다. 벡터가 정확히 이렇다. <strong>그림은 3차원에서 끝나지만, 규칙은 무한 차원까지 그대로 따라간다.</strong></p>
+
+  <p>사실 영준님은 이미 이 전략을 무의식적으로 쓰고 있었다. RAG에서 1536차원을 한 번도 "본" 적 없으면서도, "방향이 비슷하면(코사인 유사도가 높으면) 의미가 비슷하다"는 2차원의 느낌을 그대로 믿고 잘 써왔으니까. 우리는 그걸 의식적으로, 2·3차원에서 탄탄히 다지기만 하면 된다.</p>
+
+  <!-- summary -->
+  <div class="summary">
+    <h4>이번 장 한눈에 정리</h4>
+    <ul>
+      <li><strong>숫자 하나(1차원)로는 의미를 못 담는다.</strong> 순서와 거리가 억지로 생겨 엉뚱한 관계가 만들어진다.</li>
+      <li><strong>숫자를 여러 개 나열하면 공간 위의 점이 된다.</strong> 이것이 벡터다.</li>
+      <li><strong>축(차원)이 많을수록 더 미세한 의미 차이를 담는다.</strong> 근로기준법 1536 vs 3072가 그 실증.</li>
+      <li><strong>3차원 너머는 그림으로 못 그리는 게 정상.</strong> 대신 "계산 규칙은 똑같다"는 믿음으로 데려간다.</li>
+      <li><strong>벡터를 보는 두 관점:</strong> 점(위치) vs 화살표(방향). 이 중 '화살표' 관점이 다음 장 <em>내적(닮음 재기)</em>으로 가는 다리가 된다.</li>
+    </ul>
+  </div>
+
+  <h3>다음 장 예고</h3>
+  <p>벡터를 "화살표"로 보면, 두 화살표가 <strong>얼마나 같은 방향을 보는지</strong>를 잴 수 있다. 그게 바로 <strong>내적(dot product)</strong>이고, 영준님이 매일 쓰는 코사인 유사도의 정체다. "왜 내적이 닮음을 재는 도구인지"를 다음에 손으로 느껴볼 것이다.</p>
+
+  <footer>
+    수학적 직관 다지기 · Chapter 1 — 벡터란 무엇인가<br>
+    질문에서 출발해 스스로 도달한 개념. 다음에 다시 읽어도 그 흐름이 살아나도록.
+  </footer>
+
+</div>
+</body>
+</html>
