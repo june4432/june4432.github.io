@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>표준이 없던 시절, 사내 MCP 프레임워크를 만들며 내린 12가지 결정</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1419; --panel: #161b22; --ink: #e6edf3; --muted: #8b949e;
+    --line: #30363d; --feature: #3fb950; --test: #d29922; --master: #f85149;
+    --accent: #58a6ff; --purple: #bc8cff; --code-bg: #0d1117;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--ink); font-family: 'IBM Plex Sans KR', sans-serif; line-height: 1.75; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 0 24px; }
+  ::selection { background: rgba(88,166,255,0.3); }
+  .hero { padding: 80px 0 56px; border-bottom: 1px solid var(--line); }
+  .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--purple); margin-bottom: 20px; }
+  .hero h1 { font-size: clamp(28px, 4.5vw, 44px); font-weight: 700; line-height: 1.22; letter-spacing: -0.02em; }
+  .hero .lede { margin-top: 22px; color: var(--muted); font-size: 17px; }
+  .hero .lede.blockquote { border-left: 3px solid var(--purple); padding-left: 18px; margin-top: 24px; }
+  .meta { margin-top: 28px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--muted); display: flex; gap: 16px; flex-wrap: wrap; }
+  .meta .dot { color: var(--feature); }
+  article { padding: 40px 0; }
+  h2 { font-size: 25px; font-weight: 700; margin: 60px 0 20px; letter-spacing: -0.01em; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+  h2 .num { font-family: 'JetBrains Mono', monospace; font-size: 15px; color: var(--purple); margin-right: 10px; }
+  h3 { font-size: 19px; font-weight: 600; margin: 40px 0 14px; color: #fff; }
+  h3 .d { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: var(--bg); background: var(--accent); padding: 2px 9px; border-radius: 6px; margin-right: 10px; vertical-align: middle; }
+  p { margin: 15px 0; font-size: 16px; }
+  strong { color: #fff; font-weight: 600; }
+  .tag { font-weight: 600; color: var(--accent); }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: rgba(110,118,129,0.2); padding: 2px 6px; border-radius: 5px; color: #c9d1d9; }
+  pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; overflow-x: auto; margin: 20px 0; }
+  pre code { background: none; padding: 0; font-size: 12.5px; line-height: 1.65; color: #c9d1d9; }
+  .cmt { color: #6a737d; }
+  blockquote { border-left: 3px solid var(--test); background: var(--panel); padding: 14px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; color: var(--muted); font-size: 14.5px; }
+  blockquote code { font-size: 0.9em; }
+  ul { margin: 16px 0; padding-left: 22px; }
+  li { margin: 8px 0; font-size: 16px; }
+  .b-feature { color: var(--feature); font-weight: 600; }
+  .b-test { color: var(--test); font-weight: 600; }
+  .b-master { color: var(--master); font-weight: 600; }
+  hr { border: none; border-top: 1px solid var(--line); margin: 40px 0; }
+  footer { border-top: 1px solid var(--line); padding: 32px 0 64px; color: var(--muted); font-size: 13px; font-family: 'JetBrains Mono', monospace; }
+  footer a { color: var(--accent); text-decoration: none; }
+  footer .refs { margin-top: 12px; line-height: 1.9; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow">mcp · 9-month build log</div>
+    <h1>표준이 없던 시절, 사내 MCP 프레임워크를<br>만들며 내린 12가지 결정</h1>
+    <p class="lede blockquote">2025년 여름부터 약 9개월간, 한솔그룹의 업무 시스템을 LLM에 연결하는 MCP 서버 프레임워크를 설계하고 운영했다. 그룹 내 첫 MCP 프레임워크였고, 그 위에 올린 첫 실증 사례(회의실 예약 MCP)는 사내 LLM 플랫폼에 등록된 1호 MCP가 됐다. 그 사이 MCP 스펙은 세 번 개정됐고, 내가 내린 결정 중 어떤 것은 이후 표준이 같은 방향으로 왔고, 어떤 것은 표준과 정반대로 갈렸다. 이 글은 그 판단들의 기록이다. 자랑이 아니라, 지금 비슷한 걸 만들고 있을 누군가를 위한 트레이드오프 노트에 가깝다.</p>
+    <div class="meta"><span><span class="dot">●</span> 2025~2026 · 한솔그룹</span><span>MCP Framework</span><span>D1–D12 · 설계 · 실증 · 전파</span></div>
+  </div>
+  <article>
+
+  <h2><span class="num">01</span>왜 직접 만들 수밖에 없었나</h2>
+  <p>나는 운영 중인 사내 인사(HR) 시스템을 담당하고 있었다. 2025년 7월, 그 도메인의 업무들을 LLM에 연결해 보려고 MCP 서버 프로토타입을 처음 커밋했다. 회의실 예약, 자산 조회, 급여명세서 — 흔한 그룹웨어 업무 도구들이었다. 첫 커밋의 패키지 설명은 "Streamable HTTP MCP Server implementation using TypeScript SDK". SDK 버전은 <code>^1.0.0</code>이었고, lockfile은 1.17.0을 가리키고 있었다. 당시 그룹 안에 MCP를 다뤄본 팀은 없었고, 따라서 참고할 사내 선례도 없었다.</p>
+  <p>당시 MCP 스펙이 없었던 건 아니다. 2024-11-05 초판이 있었고, Streamable HTTP를 도입한 2025-03-26 개정판도 나와 있었다. 문제는 스펙이 다루는 범위 밖에 있었다. <strong>사내 시스템에 MCP를 붙이는 순간 필요해지는 것들 — 사용자 인증, 계열사별 권한, 감사 로그, 중복 실행 방지 — 에 대해 스펙은 아무 말이 없었다.</strong></p>
+  <p>그리고 도구를 서너 개 만들어보니 더 근본적인 문제가 보였다. 도구 하나를 추가할 때마다 세션 검증, 인증 정보 조회, 환경변수 체크, 에러 처리를 매번 복사해 붙이고 있었다. 프레임워크화 직전의 자체 진단 문서에는 이렇게 남아 있다:</p>
+  <blockquote>"핵심 비즈니스 로직보다 인프라 코드가 10배 이상 많음" — PHILOSOPHY.md</blockquote>
+  <p>10월에 프로젝트를 재개하면서 목표를 다시 세웠다. 내가 도구를 만드는 게 아니라, <strong>다른 팀 개발자가 포크해서 30줄짜리 비즈니스 로직만 얹으면 되는 프레임워크</strong>를 만들자. 당시 설계 문서의 목표 문장 그대로다:</p>
+  <blockquote>"다른 팀이 포크해서 쉽게 도구를 추가할 수 있는 프레임워크 구조 구축" — 2025-10-16 설계 문서</blockquote>
+  <p>그 뒤 2주 만에 프로토타입의 도구들을 전부 갈아엎었다(1,561줄 → 859줄, 커밋 <code>3c095f7</code>). 이 글의 나머지는 그 과정에서 마주친 갈림길들이다.</p>
+
+  <h2><span class="num">02</span>그때 마주친 근본 질문들</h2>
+  <p>정답지가 없었으니, 질문부터 정리해야 했다. 돌아보면 모든 설계 결정은 결국 이 다섯 질문의 변주였다.</p>
+  <ul>
+    <li><strong>상태는 누가 들고 있어야 하는가?</strong> MCP는 세션 기반 프로토콜처럼 보였다. 그런데 세션의 주인은 누구인가 — 챗봇 서버(호스트)인가, 그 뒤의 수천 명 사용자인가?</li>
+    <li><strong>"사용자"는 누구인가?</strong> MCP 스펙에는 사용자 개념이 없었다. 도구를 호출하는 건 LLM이고, 요청을 보내는 건 챗봇 서버다. 그런데 회의실을 예약하는 건 결국 김 대리다. 김 대리의 신원은 어느 틈으로 흘려보내야 하는가?</li>
+    <li><strong>도구 개발자는 무엇까지 알아야 하는가?</strong> MCP 스펙? JSON-RPC? JWT? 아니면 정말 비즈니스 로직만?</li>
+    <li><strong>LLM은 신뢰할 수 있는 호출자인가?</strong> 같은 예약을 두 번 호출하면? SQL 조각이 섞인 파라미터를 만들어내면?</li>
+    <li><strong>스펙과 얼마나 거리를 둘 것인가?</strong> 스펙이 계속 바뀌는 상황에서, 스펙에 바짝 붙을 것인가, 한 겹 감싸서 거리를 둘 것인가?</li>
+  </ul>
+  <h2><span class="num">03</span>핵심 설계 결정들</h2>
+  <p>각 결정은 <span class="tag">상황 → 선택지 → 내 판단 → 근거</span> 순서로 정리했다. 근거의 커밋 해시와 파일 경로는 실제 저장소 기준이다.</p>
+
+  <h3><span class="d">D1</span>함수 등록이 아니라 클래스 상속으로 — BaseTool과 Template Method</h3>
+  <p><strong>상황.</strong> 프로토타입 시절의 도구는 SDK의 <code>server.registerTool()</code>을 직접 감싼 함수였다. 도구마다 세션 체크, 인증 정보 조회, <code>EXTERNAL_API_HOST</code> 환경변수 체크, try-catch가 복붙되어 있었다. 도구 하나가 200~460줄이었다.</p>
+  <p><strong>선택지.</strong> ① SDK API를 그대로 노출하고 가이드 문서로 커버, ② 공통 로직을 함수형 미들웨어로 추출, ③ 추상 클래스 + Template Method로 실행 파이프라인 전체를 프레임워크가 소유.</p>
+  <p><strong>내 판단.</strong> ③. <code>BaseTool</code>을 상속하고 <code>name/title/description/inputSchema</code>와 <code>execute()</code>만 구현하면 끝나게 했다. JWT 추출 → 검증 → ToolContext 생성 → 멱등성 체크 → Zod 검증 → <code>execute()</code> 호출 → 결과 캐싱 → 로깅 → 에러 변환, 이 파이프라인은 전부 <code>register()</code> 템플릿 메서드 안에 있다. 개발자에게 노출되는 헬퍼는 <code>this.http</code>(인증 자동 주입), <code>formatAsTable/formatAsList</code>, <code>hasPermission/requirePermission</code>, <code>this.logger</code> 정도다.</p>
+  <p><strong>근거.</strong> 커밋 <code>3c095f7</code>(2025-10-16)이 이 전환 자체다: "6개 도구를 BaseTool 프레임워크로 마이그레이션 (1,561줄 → 859줄)". 다음 날 Resources/Prompts까지 같은 패턴으로 확장했다(<code>a4b668c</code>). 도구 추가에 걸리는 시간도 2~3시간에서 5~10분 수준으로 줄었다고 적어두긴 했지만, 이는 실측이 아니라 설계 문서상의 추정치로 봐야 한다.</p>
+  <p><strong>트레이드오프.</strong> 파이프라인을 프레임워크가 독점하면 개발자가 중간 단계에 개입할 수 없다. 실제로 나중에 "이 도구만 멱등성 끄고 싶다" 같은 요구가 나왔고, <code>protected useIdempotency = false</code> 같은 opt-out 플래그를 하나씩 뚫어주는 식으로 대응했다(D7). 플래그가 늘어나는 건 Template Method의 고전적 비용이다.</p>
+
+  <h3><span class="d">D2</span>설정 파일 대신 디렉토리 컨벤션 — 파일 위치가 곧 등록</h3>
+  <p><strong>상황.</strong> 프로토타입에는 <code>CompanyModuleLoader</code>라는 클래스가 있었다. 회사를 추가하려면 switch 문에 분기를 넣고 import를 추가해야 했다. "설정 코드를 고쳐야 도구가 등록되는" 구조.</p>
+  <p><strong>선택지.</strong> ① 명시적 등록 파일, ② JSON/YAML 설정 파일, ③ 디렉토리 스캔 기반 자동 발견.</p>
+  <p><strong>내 판단.</strong> ③. <code>src/tools/common/</code>에 파일을 만들고 <code>export default</code>만 하면 빌드 후 자동 등록된다. 레지스트리가 디렉토리를 재귀 스캔해서 동적 import하고, duck-typing으로 검증한 뒤 의존성을 주입한다. 한 걸음 더 나가서, <strong>디렉토리 이름 자체를 권한 설정으로</strong> 썼다. <code>company-A/</code> 디렉토리에 놓인 도구는 자동으로 해당 계열사 전용이 된다:</p>
+  <pre><code><span class="cmt">// ToolRegistry.ts — company-XX 디렉토리에서 로드되면 자동으로 회사 제한</span>
+if (companyCode &amp;&amp; !tool.allowedCompanies) {
+  (tool as any).allowedCompanies = [companyCode];
+}</code></pre>
+  <p><strong>근거.</strong> 자동 로딩은 <code>3c095f7</code>에서 도입, 회사별 동적 로딩은 <code>a2af434</code>(2025-10-27). 설계 문서의 원칙 문장: "설정 파일 없이, 디렉토리 구조만으로 모든 것이 결정됩니다"(PHILOSOPHY.md).</p>
+  <p><strong>트레이드오프.</strong> 컨벤션은 아는 사람에게만 보인다. "도구가 왜 안 나타나죠?"라는 질문의 답이 대부분 "default export 빠뜨림 / 빌드 안 함 / 디렉토리 위치 틀림"이었고, 결국 CLAUDE.md와 트러블슈팅 문서에 이 세 가지를 표로 박아두는 걸로 수습했다. 컨벤션 기반 설계는 문서화 비용을 같이 지불해야 한다.</p>
+  <h3><span class="d">D3</span>계열사마다 서버를 세우지 않는다 — 단일 인스턴스 Multi-tenant</h3>
+  <p><strong>상황.</strong> 그룹사 환경이라 계열사마다 쓰는 도구가 다르다. A사는 회의실 예약, B사는 수당 조회. 가장 쉬운 답은 계열사별로 MCP 서버 인스턴스를 하나씩 띄우는 것.</p>
+  <p><strong>선택지.</strong> ① 계열사별 인스턴스(격리 확실, 운영 부담 N배), ② 단일 인스턴스 + 요청 시점 필터링.</p>
+  <p><strong>내 판단.</strong> ②. JWT에서 회사 코드를 꺼내 <code>tools/list</code> 응답을 요청마다 동적으로 필터링한다. <code>allowedCompanies</code>가 없는 도구는 공통, 있으면 해당 회사만 보인다. 설계 문서에도 당시 비교를 그대로 남겼다: "전통적 접근(잘못됨): 회사별 별도 인스턴스… 문제: 서버 중복, 메모리 낭비".</p>
+  <p><strong>근거.</strong> <code>a2af434</code>(Tools), <code>56a9b28</code>(Resources/Prompts 확장, 2025-10-28), docs/MULTI_TENANT.md.</p>
+  <p><strong>트레이드오프.</strong> 솔직하게 적자면, 필터링 함수는 JWT 검증에 실패했을 때 예외를 던지는 대신 <strong>공통 도구만 반환하는 fail-open</strong>이다. "인증이 죽어도 목록 조회는 되게" 하려던 판단이었지만, 회사 전용 도구가 공통 도구로 잘못 분류되는 실수가 생기면 이 완충 장치가 노출 사고로 이어질 수 있다. 지금 다시 설계한다면 list는 fail-open, call은 fail-closed로 명시적으로 갈라 문서화하겠다.</p>
+
+  <h3><span class="d">D4</span>스펙에 인증이 없던 시절의 사용자 신원 전파 — 커스텀 헤더 x-user-jwt</h3>
+  <p><strong>상황.</strong> 이 프레임워크에서 가장 "표준 부재"를 체감한 지점이다. MCP의 등장인물은 호스트(챗봇 서버)와 서버뿐인데, 실제로 회의실을 예약하는 건 챗봇 뒤의 개별 직원이다. 도구는 "누가" 호출했는지 알아야 하고, 업무 API는 그 사용자의 권한으로 호출되어야 한다. 스펙엔 이 경로가 없었다.</p>
+  <p><strong>선택지.</strong> ① 세션에 API Key를 바인딩, ② 매 요청에 사용자 토큰을 실어 보내는 커스텀 헤더, ③ (당시 기준 미래의) 표준 인증 스펙을 기다린다.</p>
+  <p><strong>내 판단.</strong> ①에서 ②로 옮겼다. 챗봇 서버가 매 요청에 <code>x-user-jwt</code> 헤더로 사용자 JWT를 실어 보내면, 프레임워크가 사내 인증 미들웨어 API로 검증(5분 캐시)하고 <code>ToolContext.user</code>로 만들어 도구에 주입한다. 도구가 업무 API를 부를 때는 <code>this.http</code>가 원본 JWT를 자동으로 다시 실어 보낸다. 도구 개발자는 인증 코드를 한 줄도 쓰지 않는다.</p>
+  <p><strong>근거.</strong> JWT 전환은 <code>893d052</code>(2025-10-27). 표준이 없으니 헤더 이름조차 팀 간 협의 대상이었다:</p>
+  <blockquote>"챗봇 서버팀 협의 (미완료) … 현재: 커스텀 헤더 사용 (<code>x-user-jwt</code>) / 확인 필요: <code>Authorization: Bearer &lt;token&gt;</code> 사용 여부" — V1_CHECKLIST.md (2025-10-28)</blockquote>
+  <p>결국 2026년 3월에 두 헤더를 모두 받도록 통합했다(<code>7d60952</code>). 처음부터 표준 헤더를 썼으면 안 겪었을 분기다.</p>
+  <p><strong>트레이드오프.</strong> 이 구조는 "MCP 서버와 업무 API가 같은 신뢰 도메인"이라는 전제 위에 서 있다. 원본 JWT를 하류 API로 그대로 전달하는 방식은 사내망에서는 단순하고 강력하지만, 도메인 경계를 넘는 순간 토큰 전달(token passthrough) 안티패턴이 된다 — 이후 표준이 이걸 어떻게 금지했는지는 6장에서 다룬다. 개발 편의를 위해 만든 인증 바이패스 모드도 이중 잠금을 걸긴 했지만, 서명 미검증 파싱이라는 본질적 위험은 남는다. 이런 경로는 프로덕션 빌드에서 컴파일 타임에 제거되는 게 더 나았다고 본다.</p>
+  <h3><span class="d">D5</span>상태 관리, 세 번 갈아엎다 — 세션 → JWT Stateless → 멀티 호스트 세션 → 완전 Stateless</h3>
+  <p>이 프레임워크에서 가장 많이 번복한 결정이자, 가장 배운 게 많은 결정이다. 네 단계를 겪었다.</p>
+  <p><strong>1기 (2025-07~10): 사용자별 세션 Stateful.</strong> initialize마다 세션을 만들고, 세션마다 Transport + McpServer + 레지스트리 3종을 통째로 생성해 인메모리 맵에 보관했다. 심지어 세션 자동 정리가 주석 처리되어 있었다 — "세션을 무제한으로 유지하기 위해 자동 정리 비활성화"라는 주석과 함께.</p>
+  <p><strong>전환 계기.</strong> 챗봇 정식 연동을 앞두고 동시성 분석을 했더니(<code>e310f4b</code>, SCALABILITY.md) 결과가 참담했다: "세션 자동 정리가 완전히 비활성화… 서버 재시작 전까지 모든 세션이 메모리에 누적", 1,500 커넥션에서 파일 디스크립터 고갈로 크래시 예상. 사용자 수 × 세션 메모리라는 곱셈 구조 자체가 문제였다.</p>
+  <p><strong>2기 (2025-10-27): 인증의 Stateless화.</strong> "챗봇 호스트 1개 = MCP 연결 1개, 사용자 식별은 매 요청 JWT"로 구조를 뒤집었다(<code>893d052</code>, "N:N → 1:N"). 세션 저장소가 사라지니 메모리가 사용자 수와 무관해졌다. 설계 문서에는 "사용자 수에 비례하던 메모리를 고정값 수준으로" 낮췄다고 적었는데, 이 수치 역시 실측이 아닌 추정으로 봐야 한다.</p>
+  <p><strong>3기 (2025-11-04): 호스트 세션만 Stateful로 복귀.</strong> 그런데 현실에선 클라이언트가 하나가 아니었다. Claude Desktop, MCP Inspector, 챗봇 서버가 동시에 붙으니 단일 호스트 전제가 깨졌고, <code>HostStateManager</code>로 호스트 세션별 상태 관리를 다시 들여왔다(<code>91205c1</code>). <strong>사용자 인증은 stateless, 호스트 연결은 stateful</strong>이라는 절충. 이때 나는 이게 최종형인 줄 알았다.</p>
+  <p><strong>4기 (2026-03-17): 전송 계층까지 완전 Stateless.</strong> 사내 LLM 애플리케이션 플랫폼 "AI 아틀라스"가 OpenAI Agents SDK로 이 서버에 붙으면서 간헐 장애가 터졌다. 분석해 보니 클라이언트 SDK가 타임아웃 시 세션을 조기 DELETE하고, 우리 서버는 그 세션의 transport를 닫아 진행 중인 응답이 유실되는 구조였다. 클라이언트 버그였지만, <strong>세션이라는 공유 상태가 있는 한 클라이언트의 수명 관리 실수가 곧 서버 장애가 된다</strong>는 게 본질이었다. 그래서 세션을 아예 없앴다 — 매 요청마다 Transport + Server를 새로 만들고(<code>sessionIdGenerator: undefined</code>), 비용이 큰 도구 레지스트리만 서버 기동 시 1회 로딩해 전 요청이 공유한다(<code>7d60952</code>). 현재 코드의 주석이 결론이다:</p>
+  <pre><code><span class="cmt">// 매 요청마다 새로운 Transport + Server를 생성하여
+// 세션 관리 문제(조기 DELETE, TaskGroup 충돌 등)를 근본적으로 회피합니다.
+// 레지스트리는 공유하므로 도구 로딩 오버헤드 없음. — src/index.ts</span></code></pre>
+  <p>한 달 뒤 세션 관련 데드코드를 전부 걷어냈다(<code>36bb2b7</code>, 18파일 -1,872줄).</p>
+  <p><strong>돌아보면.</strong> 2기에서 4기까지 5개월이 걸린 이유는, 나는 계속 "세션을 어떻게 잘 관리하나"를 풀고 있었기 때문이다. 정답은 "관리할 세션을 없앤다"였다. 3기의 <code>HostStateManager</code>는 정성 들여 만든 4개월짜리 우회로였던 셈이다. 다만 공짜는 아니어서, 완전 stateless로 가며 서버발 알림(SSE 스트리밍, 리소스 구독)을 포기했다 — GET /mcp는 이제 405를 반환한다. 사내 업무 도구는 요청-응답형이 대부분이라 감당 가능한 손실이었지만, 알림이 핵심인 도메인이라면 이 트레이드오프는 반대로 기울 수 있다.</p>
+  <h3><span class="d">D6</span>stdio를 버리고 HTTP 전용으로</h3>
+  <p><strong>상황.</strong> 초기에는 stdio 진입점(로컬 Claude Desktop용)과 HTTP 진입점을 둘 다 유지했다. 문제는 두 경로의 인증 모델이 달랐다는 것 — stdio 쪽은 레거시 세션/API Key 경로를 쓰는 별도 코드였다.</p>
+  <p><strong>내 판단.</strong> HTTP 전용. stdio 진입점을 삭제하고(<code>79e668b</code>, 2025-11-18), Claude Desktop이나 Cursor는 <code>mcp-remote</code> 브릿지로 HTTP 엔드포인트에 붙이게 안내했다. 사내 서버는 어차피 원격 배포가 전제고, 인증 경로가 두 벌인 것이 보안·유지보수 양쪽에서 손해였다.</p>
+  <p><strong>트레이드오프(반성 포함).</strong> 같은 커밋에서 vitest 테스트 스위트(1,100줄+)도 함께 삭제됐다. "HTTP 전용 전환으로 깨진 테스트를 고치는 대신 지운" 결정이었는데, 이건 지금도 부채로 남아 있다. 아키텍처를 갈아엎을 때 테스트를 같이 갈아엎을 여력이 없다면, 최소한 계약 테스트라도 남겼어야 했다.</p>
+
+  <h3><span class="d">D7</span>스펙에 없는 안전장치를 기본값으로 — 프레임워크 레벨 멱등성</h3>
+  <p><strong>상황.</strong> 도구의 호출자는 사람이 아니라 LLM이다. 재시도 로직, 네트워크 타임아웃, 호스트의 재전송이 겹치면 "회의실 예약" 같은 mutation 도구가 두 번 실행될 수 있다. MCP 스펙에는 중복 실행 방지 개념이 없었다.</p>
+  <p><strong>내 판단.</strong> 프레임워크가 자동 멱등성 제공, 그리고 <strong>기본값을 켬으로</strong>. 도구명 + 사용자 + 정렬된 파라미터의 SHA-256으로 키를 만들어, 같은 요청이 TTL 안에 다시 오면 캐시된 결과를 반환한다. 조회 도구는 <code>useIdempotency = false</code>로 opt-out.</p>
+  <pre><code><span class="cmt">// IdempotencyManager.ts — 파라미터 키 정렬 후 해시</span>
+const sortedParams = JSON.stringify(params, Object.keys(params).sort());
+const hash = crypto.createHash('sha256')
+  .update(`${toolName}:${sessionId}:${sortedParams}`).digest('hex');</code></pre>
+  <p><strong>근거.</strong> Phase 5로 구현(<code>a4b668c</code>). 흥미로운 디테일이 하나 있는데, 초기엔 사용자의 자연어 질문(<code>userQuery</code>)까지 키에 들어가는 바람에 "같은 예약인데 질문 문장이 다르면 다른 요청"으로 판정됐다. 키 생성에서 LLM 메타데이터를 제외하는 개선이 별도 커밋으로 남아 있다(<code>9185ff8</code>). 멱등성 키는 <strong>비즈니스 파라미터만으로</strong> 만들어야 한다는 교훈.</p>
+  <p><strong>트레이드오프.</strong> 저장소가 인메모리 Map이라 서버 재시작이나 다중 인스턴스에서 멱등성이 깨진다. 사내 단일 인스턴스 전제로는 충분했지만, 수평 확장하는 순간 Redis 같은 외부 저장소가 필요하다.</p>
+
+  <h3><span class="d">D8</span>에러는 프로토콜이 아니라 대화로</h3>
+  <p><strong>상황.</strong> 도구 실행이 실패했을 때 JSON-RPC 에러를 던지면, 그 에러의 1차 소비자는 LLM이고 최종 소비자는 채팅창의 직원이다. <code>-32603 Internal Error</code>는 둘 다에게 쓸모가 없다.</p>
+  <p><strong>내 판단.</strong> 도구 레벨 실패는 "정상 응답에 실린 사용자 친화 문자열"로. 도구는 실패 시 <code>'❌ 시작 날짜는 종료 날짜보다 이전이어야 합니다…'</code>처럼 <strong>LLM이 다음 행동(재질문, 파라미터 수정)을 결정할 수 있는</strong> 한국어 메시지를 반환한다. 세션 만료를 위해 <code>-32001</code>이라는 커스텀 에러 코드도 정의했다 — 표준 코드 범위에 없는 번호를 내 마음대로 정한, 전형적인 "표준 부재기 임의 결정"이다.</p>
+  <p><strong>돌아보면.</strong> <code>-32001</code>은 stateless 전환(D5 4기)으로 세션 개념이 사라지며 코드에서 자취를 감췄는데, 문서에는 재연결 가이드가 한동안 남아 있었다. 임의로 정의한 프로토콜 확장은 수명이 짧고, 죽은 뒤에도 문서에 유령으로 남는다. 반면 "에러는 LLM이 읽고 행동할 수 있는 문장으로"라는 원칙 자체는 지금도 유효하다고 본다.</p>
+  <h3><span class="d">D9</span>도구 인터페이스의 진짜 소비자는 LLM이다 — 숨은 필드와 출력 포맷터</h3>
+  <p><strong>상황.</strong> MCP 도구의 스키마와 응답을 설계하다 보면, 이 인터페이스의 소비자가 사람 개발자가 아니라 LLM이라는 사실이 계속 튀어나온다. 그런데 스펙은 "LLM이 잘 쓰게 만드는 법"에 대해선 아무 말이 없다.</p>
+  <p><strong>내 판단.</strong> 세 가지 컨벤션을 자체적으로 만들었다. ① <strong>숨은 필드 주입</strong> — 프레임워크가 모든 도구 스키마에 <code>userQuery</code>(원본 질문), <code>clientAnalysis</code>, <code>idempotencyKey</code>를 자동 추가하고, 실행 직전에 제거해 도구에는 순수 비즈니스 파라미터만 넘긴다. 사용자 컨텍스트를 전파할 표준 채널이 없어서 <strong>LLM 자신을 운반책으로 쓴</strong> 것이다. ② <strong>출력 포맷 표준화</strong> — <code>formatAsTable/formatAsList</code>로 응답을 마크다운 표/리스트로 통일. ③ <strong>description 작성 가이드</strong> — "설명은 생각보다 더 자세히, few-shot 예시를 포함하라"를 명문화. 도구 선택 정확도는 코드가 아니라 description 품질이 좌우한다는 걸 운영에서 배웠다.</p>
+  <p><strong>트레이드오프.</strong> 숨은 필드 주입은 영리하지만 취약하다. LLM이 <code>userQuery</code>를 안 채워주면 그만이고, 스키마를 오염시킨다는 비판도 가능하다. 표준화된 메타데이터 채널(<code>_meta</code>)이 스펙에서 자리 잡은 지금이라면 그쪽을 쓰겠다.</p>
+
+  <h3><span class="d">D10</span>z.string()은 방어가 아니다 — SafeSchemas</h3>
+  <p><strong>상황.</strong> LLM이 생성한 파라미터가 검증 한 겹만 거치고 사내 업무 API로 직행하는 구조다. 운영하다 보니 순진한 Zod 스키마의 구멍이 보였다. <code>z.string().length(6)</code>은 "202599"(99월)를 통과시키고, <code>z.string().min(1)</code>은 스크립트 태그도 SQL 조각도 통과시킨다.</p>
+  <p><strong>내 판단.</strong> Zod 위에 화이트리스트 프리셋 계층(<code>SafeSchemas</code>)을 만들어 프레임워크에 내장했다. <code>SafeSchemas.date()</code>는 실제 달력 유효성까지 검증하고, <code>safeString()</code>은 허용 문자 화이트리스트로 제한하고, <code>safePath()</code>는 경로 탈출을 차단한다. 신규 도구는 필수, 기존 도구는 mutation부터 점진 적용(<code>63afa56</code>, 2025-11-17).</p>
+  <p><strong>돌아보면.</strong> 방어의 최종 책임은 당연히 업무 API 쪽에 있다. 하지만 "LLM이 만든 입력"이라는 새로운 종류의 신뢰할 수 없는 입력원 앞에서, 프레임워크가 기본 방어선을 제공하는 것과 개별 개발자의 선의에 맡기는 것의 차이는 크다. 이건 지금 다시 만들어도 같은 판단을 할 것이다.</p>
+
+  <h3><span class="d">D11</span>관측성도 스펙 밖이었다 — SQLite 한 파일 로깅과 IP 추적 체인</h3>
+  <p><strong>상황.</strong> "어제 누가 어떤 질문으로 어떤 도구를 호출했고 뭐가 실패했나"에 답할 수 있어야 운영이 된다. MCP엔 관측성 스토리가 없었다.</p>
+  <p><strong>내 판단.</strong> 별도 인프라 없이 SQLite 파일 하나(<code>logs/mcp-logs.db</code>)에 전 호출을 기록했다. 디테일 두 가지가 실전에서 나왔다. <strong>원본/정리 파라미터 분리 저장</strong>(<code>3923df7</code>): LLM 메타데이터가 섞인 원본 인자와 도구에 실제 전달된 순수 파라미터를 별도 컬럼으로. <strong>엔드유저 IP 추적 체인</strong>(<code>ae89586</code>): 챗봇 서버가 프록시가 되며 IP가 전부 챗봇 서버로 찍히자, <code>x-client-ip &gt; x-forwarded-for &gt; req.ip</code> 우선순위의 커스텀 헤더 체인을 챗봇 팀과 협의해 만들었다.</p>
+  <p>감사 로그가 SQLite 한 파일이라는 건 동시 쓰기와 보존 정책 관점에서 한계가 분명하지만, "일단 전부 기록하고 있다"는 사실이 초기 운영에서 몇 번이나 우리를 구했다.</p>
+
+  <h3><span class="d">D12</span>SDK와의 거리 두기 — 어댑터 격리와 exact pin</h3>
+  <p><strong>상황.</strong> 의존하는 SDK가 빠르게 움직였다. 결국 8개월 사이 1.17.0 → 1.27.1로 뛰었고, 그 사이 cross-client data leak, DNS Rebinding 같은 보안 수정이 끼어 있었다.</p>
+  <p><strong>내 판단.</strong> 두 가지. ① <strong>SDK를 어댑터 계층에 가둔다.</strong> SDK import는 <code>core/handlers/</code>와 <code>src/index.ts</code>에만 존재한다. <code>BaseTool</code>과 모든 비즈니스 도구는 SDK 타입을 전혀 모른다. 그 결과 SDK 1.17→1.27 메이저급 업그레이드(+stateless 전환)에서 <strong><code>src/tools/</code> 아래 파일은 단 하나도 바뀌지 않았다.</strong> ② <strong>버전은 캐럿 없이 고정한다.</strong> 업그레이드 직후 <code>"1.27.1"</code>로 exact pin을 걸고 프레임워크를 v2.0.0으로 올렸다(<code>e0221ed</code>).</p>
+  <p><strong>돌아보면.</strong> 사실 처음의 <code>^1.0.0</code>은 전략이 아니라 무신경이었고, 1.17.0은 lockfile이 우연히 고정해 준 버전이었다. "우연한 고정"으로 8개월을 버티다 보안 CVE로 강제 업그레이드를 겪고 나서야 "의도된 고정"으로 바꾼 것이다. 순서가 반대였어야 했다. 다만 어댑터 격리는 처음부터 의도한 설계였고, 이 프레임워크에서 가장 확실하게 값어치를 한 결정이라고 생각한다.</p>
+  <h2><span class="num">04</span>만든 것을 스스로 증명하다 — 회의실 예약 시스템 실증</h2>
+  <p>프레임워크를 만드는 사람이 빠지기 가장 쉬운 함정은, 만들어놓고 첫 유저가 나타나기를 기다리는 것이다. "포크해서 30줄만 얹으세요"라는 주장은 누군가 실제로 그렇게 해서 프로덕션에 올리기 전까지는 가설일 뿐이다. 그래서 첫 유저는 내가 되기로 했다. 내가 운영하던 HR 도메인 옆의 <strong>회의실 예약 시스템을 MCP로 컨버팅해 전 계열사에 오픈</strong>했다.</p>
+  <p>이 사례를 여기 쓰는 이유는 자랑이 아니라, 3장의 결정들이 책상 위 설계가 아니었다는 근거를 대기 위해서다. 커밋 이력이 그 궤적을 그대로 보여준다. 첫 프로토타입의 회의실 도구는 주석에 <code>// 회의실 신청 로직 (목업)</code>이라고 적힌 가짜였다(<code>2abc9c6</code>). 그것이 실제 시스템 연동과 전용 도구 정리(<code>5451553</code>), 예약 플로우 개선과 사원 검색(<code>ed8a10d</code>), 사용 종료·취소·예약 조회 확장(<code>2174d51</code>), 회의실별 동적 시간 간격 검증(<code>331e720</code>)으로 다듬어졌다. 목업이 프로덕션이 되는 데 걸린 넉 달이, 곧 프레임워크가 검증된 기간이다.</p>
+  <p>더 중요한 건 방향이 역류했다는 점이다. <strong>프레임워크의 기능 목록 상당수는 설계에서 내려온 게 아니라, 이 첫 실증에서 거슬러 올라왔다.</strong></p>
+  <ul>
+    <li>LLM이 같은 예약을 두 번 실행하는 문제 → 자동 멱등성과 키 생성 개선(D7, <code>9185ff8</code>)</li>
+    <li>"202599" 같은 날짜, 30분 단위를 벗어난 시간 → SafeSchemas의 달력 검증과 시간 간격 프리셋(D10)</li>
+    <li>"예약이 안 돼요"로는 LLM이 다음 행동을 못 정하는 문제 → 대화형 에러 메시지 원칙(D8)</li>
+    <li>계열사마다 다른 도구 세트 요구 → Multi-tenant 필터링(D3)이 탁상 요구가 아니라 실제 요구였다는 증명</li>
+  </ul>
+  <p>만들기만 했으면 몰랐을 것들이다. 프레임워크 저자가 자기 프레임워크의 첫 프로덕션 유저가 되는 것(dogfooding)은, 가장 값싸고 가장 정직한 검증 방법이었다.</p>
+
+  <h2><span class="num">05</span>그룹 최초, 아틀라스 1호 — 그리고 전파</h2>
+  <p>이 프레임워크는 한솔그룹 내 최초의 MCP 프레임워크였고, 4장의 회의실 예약 MCP는 사내 LLM 애플리케이션 플랫폼 <strong>"AI 아틀라스(Atlas)"에 가장 처음 등록된 MCP</strong>가 됐다. "1호"라는 건 순번 이상의 의미가 있다. 뒤따르는 팀이 열어보는 견본이 된다는 뜻이고, 그래서 견본이 감당해야 할 품질 기준이 곧 프레임워크의 기본값이 된다는 뜻이다.</p>
+  <p>1호의 비용도 있었다. 아틀라스가 OpenAI Agents SDK로 이 서버에 붙었을 때 터진 간헐 장애(D5의 4기)는, 아무도 먼저 밟아본 적 없는 조합이었기에 우리가 처음 밟은 지뢰였다. 클라이언트 SDK 버그 분석부터 완전 stateless 전환까지의 그 사이클은 고통스러웠지만, 결과적으로 프레임워크의 가장 큰 아키텍처 개선이 "레퍼런스 1호"라는 위치에서 나왔다. 먼저 가는 쪽이 장애도 먼저 맞고, 그만큼 먼저 배운다.</p>
+  <p>그리고 처음부터 이 프레임워크의 목표는 "내 서버"가 아니라 "다른 팀이 포크해서 쓰는 표준"이었다. 그래서 전파도 코드만큼 공을 들였고, 그 흔적 역시 저장소에 남아 있다.</p>
+  <ul>
+    <li><strong>10분 온보딩 문서</strong>: "10분만에 알아보는 MCP Tool 등록 가이드"(<code>c6f7b80</code>) — 첫 도구 등록까지의 시간을 줄이는 데 집중</li>
+    <li><strong>사내 발표 자료</strong>: 프레임워크 소개 프레젠테이션을 저장소에 포함(<code>b4b43b9</code>)</li>
+    <li><strong>포크 워크플로 설치 가이드</strong>(<code>5f89d8f</code>)와 로컬 개발용 mock 인증 서버 — 인증 인프라 없이도 로컬에서 바로 돌려볼 수 있게</li>
+    <li><strong>LLM 개발 도구용 컨텍스트 문서</strong>: CLAUDE.md를 모든 LLM 코딩 도구가 읽는 가이드로 정리(<code>0bfe1e2</code>) — 온보딩 상대가 사람만이 아니라는 판단</li>
+    <li>사내 COP(Community of Practice) 운영으로 계열사 개발자들에게 직접 전파</li>
+  </ul>
+  <p>전파 활동을 설계·구현과 분리된 "부가 업무"로 보지 않았다. 프레임워크는 코드가 아니라 채택이 완성한다. 30줄 추상화(D1)도, 디렉토리 컨벤션(D2)도, 10분 가이드도 전부 같은 문제 — "다른 팀 개발자가 진입하는 비용" — 를 깎는 하나의 작업이었고, 그것이 그룹의 AX(AI 전환) 역량을 끌어올리는 데 내가 기여할 수 있는 가장 구체적인 방법이었다.</p>
+  <h2><span class="num">06</span>표준이 따라잡은 지금, 돌아보면</h2>
+  <p>이 글을 쓰는 2026년 7월 기준, MCP는 2025-11-25 판이 최신 정식 스펙이고, 2026-07-28 판은 릴리즈 후보(RC)로 공개되어 이달 28일 정식 발표를 앞두고 있다. 즉 며칠 뒤면 새 프로토콜이 표준이 된다. 내 결정들을 이 곧 도래할 표준의 위치와 겹쳐 보면 이렇다.</p>
+  <p><strong>수렴한 것들.</strong></p>
+  <ul>
+    <li><strong>Stateless.</strong> 가장 극적인 수렴이다. 2026-07-28 릴리즈 후보는 프로토콜 레벨 세션과 <code>Mcp-Session-Id</code> 헤더를 아예 제거하고(SEP-2567), initialize 핸드셰이크까지 없앴다(SEP-2575). 내가 2026년 3월에 "세션을 관리하지 말고 없애자"로 도달한 결론에, 스펙이 넉 달 뒤 프로토콜 차원에서 도착한 셈이다. 물론 나는 원리에서 출발한 게 아니라 운영 장애에 떠밀려 도착했다 — 하지만 방향이 맞았다는 건 위안이 된다.</li>
+    <li><strong>HTTP 중심 원격 서버.</strong> stdio를 버리고 Streamable HTTP 전용으로 간 것(D6)은, 원격 MCP 생태계 전체가 간 방향과 같다.</li>
+    <li><strong>장시간 작업과 재시도.</strong> 2026-07-28 후보에 들어간 Tasks는 도구 호출의 수명·재시도 문제를 프로토콜이 다루기 시작했다는 신호다. 내가 멱등성(D7)으로 임시 대응했던 문제 공간과 겹친다. 다만 프레임워크 레벨 자동 멱등성 자체는 여전히 스펙 밖이고, 나는 여전히 mutation 도구엔 필요하다고 본다.</li>
+  </ul>
+  <p><strong>갈린 것들, 그리고 틀렸던 것들.</strong></p>
+  <ul>
+    <li><strong>인증.</strong> 완전히 갈렸다. 표준은 2025-03-26부터 OAuth 2.1 기반 인가 프레임워크를 세우고, 2025-06-18에서 RFC 9728/8707로 더 조였다. 내 <code>x-user-jwt</code> 커스텀 헤더(D4)는 표준 바깥의 사투리가 됐다. 더 아픈 지점은 따로 있다 — 스펙은 <strong>MCP 서버가 받은 토큰을 하류 API로 그대로 전달하는 것을 명시적으로 금지</strong>하는데, 내 프레임워크의 핵심 편의 기능이 바로 원본 JWT 자동 전달이다. 사내 단일 신뢰 도메인이라는 전제 덕에 실용적으로는 굴러가지만, 표준의 눈으로 보면 안티패턴이고, 도메인이 확장되는 순간 토큰 교환(token exchange) 구조로 갈아타야 한다. 지금 새로 시작한다면 인증만큼은 표준 궤도에서 출발하겠다.</li>
+    <li><strong>-32001 커스텀 에러 코드(D8).</strong> 자체 프로토콜 확장은 아키텍처가 바뀌자 코드보다 문서에 더 오래 살아남는 유령이 됐다. 공교롭게도 2026-07-28 후보에는 공식 Extensions 프레임워크와 폐기 정책이 들어왔다 — 확장이 필요하면 이제 저 궤도를 타는 게 맞다.</li>
+    <li><strong>숨은 필드 주입(D9).</strong> userQuery를 스키마에 심어 LLM더러 나르게 한 건 당시엔 어쩔 수 없는 꾀였지만, 메타데이터가 <code>_meta</code>로 정리되는 방향과는 어긋난다. 스펙이 채널을 만들어주면 사투리는 접는 게 맞다.</li>
+    <li><strong>번복 비용.</strong> 상태 관리를 세 번 갈아엎으며(D5) 배운 것: 표준이 유동적일 때는 "지금 스펙에 맞는 정교한 구조"보다 "<strong>바꾸기 쉬운 구조</strong>"가 이긴다. 살아남은 건 정교했던 세션 관리자가 아니라, 어디에 붙여도 되는 어댑터 계층(D12)과 Base 클래스(D1)였다.</li>
+  </ul>
+  <p>요약하면 — <strong>인프라 계층(상태, 전송)은 표준이 내 쪽으로 왔고, 신뢰 계층(인증)은 내가 표준 쪽으로 가야 한다.</strong> 그리고 개발자 경험 계층(추상화, 컨벤션, LLM 특화 입출력)은 여전히 스펙 밖의 영역이라, 이 프레임워크가 계속 값어치를 하는 곳도 거기다.</p>
+
+  <h2><span class="num">07</span>맺으며, 그리고 다음 글</h2>
+  <p>돌아보면 이 여정은 세 개의 분리된 일이 아니라 하나의 활동이었다. <strong>표준이 비어 있는 곳에 설계로 답하고(3장), 그 답을 스스로 첫 유저가 되어 프로덕션으로 증명하고(4장), 증명된 것을 다른 팀이 집어갈 수 있는 형태로 전파했다(5장).</strong> 프레임워크·실증·전파 중 하나라도 빠졌다면 나머지 둘의 값어치도 반감됐을 것이다. 사내에서 새로운 기술의 첫 번째 사람이 된다는 건 결국 이 세 가지를 한 몸으로 해내는 일이라는 게, 9개월 치 커밋 로그가 내게 남긴 결론이다.</p>
+  <p>이 프레임워크는 어디까지나 "도구를 서빙하는 쪽"의 이야기다. 정작 재미있는 문제는 그 위에서 시작됐다 — 이 도구들을 실제로 골라 쓰고, 계획을 세우고, 실패하면 우회하는 <strong>AI 에이전트(오딘)를 어떻게 설계했는가</strong>. 도구 선택의 정확도를 높이기 위한 description 설계, 멀티스텝 작업의 상태 관리, 그리고 에이전트가 프레임워크의 어떤 전제들을 깨뜨렸는지는 다음 글에서 다룬다.</p>
+  </article>
+  <footer>이 글의 모든 설계 결정은 실제 저장소의 커밋과 코드에 근거해 작성했다. 내부 IP·포트·호스트·서버 경로·계정 정보는 익명화했고, 정량 수치는 설계 문서상의 추정치임을 본문에 밝혔다.
+  <div class="refs">공식 스펙 참고: MCP 공식 블로그 2026-07-28 릴리즈 후보 공지 및 스펙 변경 이력<br><a href="../index.html">← June Viz Notes</a></div></footer>
+</div>
+</body>
+</html>
