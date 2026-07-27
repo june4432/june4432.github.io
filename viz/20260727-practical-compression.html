@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>실전압축 — 알고 있었는데, 왜 틀렸을까</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1419; --panel: #161b22; --ink: #e6edf3; --muted: #8b949e;
+    --line: #30363d; --feature: #3fb950; --test: #d29922; --master: #f85149;
+    --accent: #58a6ff; --purple: #bc8cff; --code-bg: #0d1117;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--ink); font-family: 'IBM Plex Sans KR', sans-serif; line-height: 1.75; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 0 24px; }
+  ::selection { background: rgba(188,140,255,0.3); }
+  .hero { padding: 80px 0 56px; border-bottom: 1px solid var(--line); }
+  .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--purple); margin-bottom: 20px; }
+  .hero h1 { font-size: clamp(28px, 4.5vw, 44px); font-weight: 700; line-height: 1.22; letter-spacing: -0.02em; }
+  .hero .lede { margin-top: 22px; color: var(--muted); font-size: 17px; }
+  .hero .lede.blockquote { border-left: 3px solid var(--purple); padding-left: 18px; margin-top: 24px; }
+  .meta { margin-top: 28px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--muted); display: flex; gap: 16px; flex-wrap: wrap; }
+  .meta .dot { color: var(--feature); }
+  article { padding: 40px 0; }
+  h2 { font-size: 25px; font-weight: 700; margin: 60px 0 20px; letter-spacing: -0.01em; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+  h2 .num { font-family: 'JetBrains Mono', monospace; font-size: 15px; color: var(--purple); margin-right: 10px; }
+  p { margin: 15px 0; font-size: 16px; }
+  strong { color: #fff; font-weight: 600; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: rgba(110,118,129,0.2); padding: 2px 6px; border-radius: 5px; color: #c9d1d9; }
+  blockquote { border-left: 3px solid var(--test); background: var(--panel); padding: 14px 20px; margin: 24px 0; border-radius: 0 8px 8px 0; color: var(--ink); font-size: 16px; }
+  .said { border-left-color: var(--master); color: var(--muted); font-style: normal; }
+  ul { margin: 16px 0; padding-left: 22px; }
+  li { margin: 8px 0; font-size: 16px; }
+  table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 15px; }
+  th, td { border: 1px solid var(--line); padding: 10px 14px; text-align: left; vertical-align: top; }
+  th { background: var(--panel); font-weight: 600; font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+  td:first-child { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--purple); white-space: nowrap; }
+  hr { border: none; border-top: 1px solid var(--line); margin: 40px 0; }
+  footer { border-top: 1px solid var(--line); padding: 32px 0 64px; color: var(--muted); font-size: 13px; font-family: 'JetBrains Mono', monospace; }
+  footer a { color: var(--accent); text-decoration: none; }
+  footer .refs { margin-top: 12px; line-height: 1.9; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow">essay · odin build log</div>
+    <h1>실전압축<br><span style="font-size:0.62em;font-weight:600;color:var(--muted)">알고 있었는데, 왜 틀렸을까</span></h1>
+    <p class="lede blockquote">프롬프트, 컨텍스트, 하네스, 루프. 나는 이 네 단어를 알고 있었다. 그런데 오딘을 만들면서 네 가지 다 순서대로 틀렸다. 몰라서 틀린 이야기가 아니라, 알면서 틀린 이야기다. 기술을 위한 기술연마와 실전압축의 차이에 대해.</p>
+    <div class="meta"><span><span class="dot">●</span> 2026 · ODIN</span><span>아키텍처 · 학습법</span><span>ReAct → 결정론 → 샌드위치</span></div>
+  </div>
+  <article>
+
+  <h2><span class="num">01</span>대답을 못 한 날</h2>
+  <p>오딘이 뽑아준 결과를 놓고 운영자 한 분이 물었다.</p>
+  <blockquote class="said">"이거 왜 이렇게 나왔어요?"</blockquote>
+  <p>나는 대답을 못 했다. 정확히는, 할 수 있는 대답이 "그날은 그렇게 판단했나 봐요" 하나뿐이었다. 그 문장을 입 밖에 내면서 내가 만든 게 제품이 아니라는 걸 알았다. 데모였다.</p>
+  <p>돌아오는 길에 계속 생각했다. 나는 이걸 몰랐던 게 아니다. LLM에게 판단을 다 맡기면 위험하다는 말, 이미 여러 번 읽었고 남한테 설명도 해봤다. 그런데도 그렇게 만들었다.</p>
+  <p>그게 이 글의 주제다. 몰라서 틀린 이야기가 아니라, <strong>알면서 틀린</strong> 이야기.</p>
+
+  <h2><span class="num">02</span>알고 있었다</h2>
+  <p>프롬프트 엔지니어링, 컨텍스트 엔지니어링, 하네스 엔지니어링, 루프 엔지니어링.</p>
+  <p>나는 이 네 단어를 알고 있었다. 컨텍스트는 잘 골라 넣어야 하고, 모델 바깥에 경계를 세워야 하고, 루프는 무한정 돌리면 안 된다. 물어보면 그럭저럭 답할 수 있는 정도였다.</p>
+  <p>그런데 오딘을 만들면서 네 가지 다 순서대로 틀렸다. 하나씩 빠짐없이.</p>
+  <p>부끄러운 얘기지만 왜 그랬는지는 알겠다. 나는 알고 있는 걸 <strong>아는 상태로만</strong> 갖고 있었다. 문장으로는 갖고 있었는데, 판단으로는 갖고 있지 않았다.</p>
+
+  <h2><span class="num">03</span>첫 번째 — 다 맡겼다</h2>
+  <p>처음엔 완전 자율 ReAct 루프였다. 도구 목록을 주고 알아서 판단해 쓰라고 했다.</p>
+  <p>잘 될 때가 있었다. 그리고 잘 될 때가 너무 좋았다. 나는 스스로를 "데모 데이 사람"이라고 생각하는 편인데, 만들고 보여주고 설득하는 사이클에서 에너지를 얻는다. 그게 강점이라고 믿고 있지만 이때는 함정이었다. 잘 되는 순간의 장면이 너무 선명해서, 안 될 때의 위험이 흐려졌다.</p>
+  <p>위험하다는 말은 알았다. 그 위험이 우리 업무에서 <strong>어떤 모양으로</strong> 나타나는지는 몰랐다.</p>
+  <p>모양은 이랬다. 도메인을 잘못 짚으면 그 아래 모든 추론이 정교하게, 아주 자신 있게 틀린다. 문법도 맞고 말투도 그럴듯한데 전부 틀려 있다. 그리고 왜 그렇게 됐는지 나도 재현할 수 없다. 같은 질문을 두 번 하면 다른 길로 갔으니까.</p>
+  <p>그게 위에 쓴 그 대화로 이어졌다.</p>
+
+  <h2><span class="num">04</span>두 번째 — 다 뺏었다</h2>
+  <p>반대로 갔다. 판단을 전부 회수했다. 경로를 고정하고, 분기를 명시하고, 도메인 해석을 규칙으로 박았다.</p>
+  <p>이번에도 나는 알고 있었다. 너무 결정론적으로 가면 유연함을 잃는다는 것. 알면서 또 그렇게 했다.</p>
+  <p>앞에서 아팠기 때문이다. 아픈 데를 피하려는 힘은 생각보다 세다. 이건 책으로 막을 수 있는 실수가 아니다. 안 아파본 사람은 이 실수를 안 하고, 아파본 사람만 한다.</p>
+  <p>재현성은 완벽해졌다. 대신 조금이라도 예상 밖의 질문이 들어오면 그대로 벽이었다. 결국 나는 사용자가 물어볼 수 있는 모든 문장을 미리 알고 있다고 가정한 셈인데, 그건 애초에 LLM을 쓰기로 한 이유를 스스로 부정하는 가정이었다.</p>
+  <p>두 번째 <code>revert</code>를 하면서는 좀 웃었다. 양쪽 극단을 다 찍고 나서야 가운데가 보이는 게 좀 나답기도 해서.</p>
+
+  <h2><span class="num">05</span>지금 — 샌드위치</h2>
+  <p>지금 도달한 형태는 그 사이에 있다. 결정론적인 경계가 LLM의 추론을 감싸는 구조.</p>
+  <p>도메인 판별, 스키마 해석, 관계 추출, 권한과 안전 검증은 결정론으로 처리한다. 그 경계 안에서 남는 의미적 빈틈 — 사용자가 모호하게 쓴 표현을 무엇으로 볼지 — 만 LLM에게 맡긴다. 그리고 결과의 형태와 검증은 다시 결정론으로 받는다.</p>
+  <p>압축해서 한 줄로 적으면 이렇게 됐다.</p>
+  <blockquote>LLM에게 "무엇을 할지" 묻지 말고, "이 뜻이 맞냐"만 물어라.</blockquote>
+  <p>이 문장은 어디서 읽은 게 아니다. 정확히 말하면, 읽었어도 그냥 지나갔을 것이다. 두 번 아파본 다음이라야 이런 문장이 문장으로 보인다.</p>
+
+  <h2><span class="num">06</span>재고와 밀도</h2>
+  <p>지식에 두 종류가 있는 것 같다는 생각을 이 즈음부터 했다.</p>
+  <p>하나는 쌓이는 지식이다. 읽은 논문 수, 아는 개념 수, 따라해본 튜토리얼 수. 진도가 보이고 측정도 되고 무엇보다 안전하다. 읽는 동안에는 틀릴 일이 없으니까. 그래서 은근히 중독성이 있다. 새 아키텍처 패턴 이름을 하나 더 알게 되면 뭔가 나아진 기분이 든다. 나도 여기 오래 머물렀다.</p>
+  <p>다른 하나는 문제를 실제로 통과시켜야만 생긴다. 그리고 통과하고 나면 대부분 사라진다. 몇 달치 고생에서 남는 건 두세 줄이다. 여기서 욕심내면 다친다, 이건 모델에게 물으면 안 된다, 이 판단은 바깥으로 빼야 한다.</p>
+  <p>손실 압축이다. 과정의 대부분은 버려지고 판단 기준만 남는다. 그런데 값이 나가는 건 그 남은 몇 줄이다.</p>
+  <table>
+    <thead><tr><th></th><th>원래 알던 것</th><th>통과한 뒤 남은 것</th></tr></thead>
+    <tbody>
+      <tr><td>프롬프트</td><td>지시를 명확히 쓴다</td><td>프롬프트로는 못 고치는 문제의 냄새를 안다</td></tr>
+      <tr><td>컨텍스트</td><td>관련 정보를 잘 넣는다</td><td>우리 그래프에서 어디까지가 도움이고 어디부터 소음인지 안다</td></tr>
+      <tr><td>하네스</td><td>모델 바깥에 경계를 둔다</td><td>어떤 판단을 빼야 하는지 목록이 있다</td></tr>
+      <tr><td>루프</td><td>무한 루프를 막는다</td><td>몇 번째 시도부터 품질이 아니라 운으로 바뀌는지 감이 있다</td></tr>
+    </tbody>
+  </table>
+  <p>왼쪽은 검색하면 나온다. 오른쪽은 안 나온다.</p>
+  <p>오해는 없어야 한다. 왼쪽이 쓸모없다는 말이 전혀 아니다. 왼쪽은 압축의 재료다. <strong>이름이 없으면 경험은 이사를 못 간다.</strong> 오딘에서 얻은 걸 다른 프로젝트로 옮길 수 있었던 건 경험에 이름을 붙인 다음이었다. 이름 없는 경험은 "그때 그거 잘 됐었는데" 정도로 남고 거기서 끝난다.</p>
+  <p>문제는 순서와 비율이다. 읽고 나서 만드는 게 아니라, 만들면서 읽어야 압축이 된다. 질문을 들고 읽는 문서는 같은 문서가 아니다. 이건 겪어보면 정말 체감이 다르다.</p>
+
+  <h2><span class="num">07</span>압축이 잘 되던 조건</h2>
+  <p>돌아보면 압축이 잘 됐던 경우엔 공통점이 있었다.</p>
+  <p><strong>문제가 실제여야 했다.</strong> 예제 데이터로 만든 데모에서는 아무것도 남지 않았다. 오딘이 쓸모 있어진 건 운영자와 프로젝트 인력이 실제 레거시 전환 산출물을 물어보기 시작한 뒤였다. 실제 질문은 내가 상상하지 못한 모양으로 온다. 그 상상 못 한 모양이 원료다.</p>
+  <p><strong>실패 비용도 실제여야 했다.</strong> 틀려도 아무 일 없으면 배우는 것도 없다. 운영 DB를 건드리는 기능에 안전 계층을 몇 겹으로 쌓게 된 건 안전이 중요한 줄 몰랐다가 알게 돼서가 아니다. 그 두려움을 내가 직접 감당해야 했기 때문이다. 밤에 잠이 잘 안 오는 종류의 두려움은 설계를 바꾼다.</p>
+  <p><strong>마지막으로, 도메인을 빼보는 작업이 필요했다.</strong></p>
+  <p>Graphify를 만들 때 내 머릿속에 있던 문제는 이거였다. 인사발령 코드가 급여 계산 로직 어디까지 영향을 주는지, 왜 매번 사람이 소스를 뒤져야 하나. 철저히 HR 문제다.</p>
+  <p>여기서 '인사발령', '급여', 'HR'을 하나씩 지워봤다. 남은 건 이거였다.</p>
+  <ul>
+    <li>개체 간 관계는 코드에 이미 결정론적으로 존재한다. 추론할 필요 없이 추출하면 된다.</li>
+    <li>관계망 전체가 아니라, 질문에서 도달 가능한 부분만 필요하다.</li>
+    <li>무엇이 필요한지 고르는 판단은 모델보다 그래프 구조가 더 잘 안다.</li>
+  </ul>
+  <p>세 문장 어디에도 HR이 없다. 그런데 HR 문제에서 출발하지 않았다면 이 세 문장은 절대 나오지 않았다.</p>
+  <p>좋은 추상화는 추상적인 데서 시작하지 않는 것 같다. 구체적인 걸 여러 번 풀어본 사람이 공통 항을 발견하는 방식으로 만들어진다. 그래서 나는 <strong>도메인 없는 AI는 알맹이 없는 껍데기</strong>라는 말을 계속 붙들고 있다. 재고만 있고 압축이 없으면 정확히 그렇게 된다.</p>
+
+  <h2><span class="num">08</span>걷기를 아는 것과 걷는 것</h2>
+  <p>아이를 보면서 이 생각을 더 하게 됐다.</p>
+  <p>아이는 걷기가 뭔지 안다. 매일 본다. 어른들이 저렇게 움직인다는 것도 알고, 자기는 지금 그게 안 된다는 것도 안다. 아는 게 부족해서 못 걷는 게 아니다.</p>
+  <p>그 거리는 넘어지는 걸로만 건널 수 있다. 아무리 오래 봐도 관찰로는 안 건너간다. 그리고 한 번 건너면 다음 문제가 저절로 보인다. 뒤집은 아이는 곧 기고, 기던 아이는 붙잡고 서고, 선 아이는 걷는다. 뒤집기 전의 아이에게 걷기는 아직 문제로 인식되지도 않는다.</p>
+  <p>내가 네 단어를 다 알면서도 순서대로 틀린 게 이것과 같았다고 생각한다. 프롬프트로 안 되는 벽에 부딪힌 다음에야 컨텍스트가 진짜 문제로 보였고, 컨텍스트를 정리해도 경로가 흔들리는 걸 겪은 다음에야 하네스가 필요해졌다.</p>
+  <p><strong>지식은 순서를 건너뛸 수 있다. 압축은 건너뛸 수 없다.</strong></p>
+
+  <h2><span class="num">09</span>그래서</h2>
+  <p>세상에 이론은 많다. 그런데 풀어야 할 문제는 그것보다 더 많다.</p>
+  <p>공부는 편하다. 진도가 보이고 실패가 없다. 나도 그 편한 쪽에 자주 머문다. 다만 그렇게 쌓은 게 재고인지 밀도인지는 실제 문제 앞에 서봐야 갈린다는 걸 이제 안다. 그리고 이 분야는 특히, 내가 논문을 다 읽는 동안 상식이 두 번쯤 바뀐다.</p>
+  <p>요즘 내가 지키려는 순서는 이렇다. 작게 만든다. 완성이 목적이 아니라 부딪히는 게 목적이다. 막힌 지점을 적어둔다. 그게 나중에 검색어가 된다. 그때 찾아 읽는다. 그리고 겪은 것에서 도메인을 빼본다. 남는 문장이 내 아키텍처다. 마지막으로 그것에 이름을 찾아 붙인다. 이름 붙은 경험만 다음 프로젝트로 이사 간다.</p>
+  <p>나는 이걸 저공비행이라고 부른다. 높이 날 준비를 하다가 못 뜨는 것보다, 낮게라도 계속 나는 게 낫다. 달리기랑 비슷하다. 첫 5킬로에 힘을 다 쓰면 완주를 못 하고, 그렇다고 준비만 하다 스타트를 안 하면 기록이 없다. 낮게 날면 지형이 보인다. 지도는 그다음에 그려도 늦지 않다.</p>
+  <p>아이는 걷기를 알아서 걸은 게 아니다. 알고도 못 걷다가, 수백 번 넘어진 다음에 걸었다.</p>
+  </article>
+  <footer>오딘의 아키텍처 변경 과정과 그때 내린 판단들을 기억나는 대로 정리했다. 사내 시스템명·데이터·수치는 일반화했다.
+  <div class="refs"><a href="../index.html">← June Viz Notes</a></div></footer>
+</div>
+</body>
+</html>
