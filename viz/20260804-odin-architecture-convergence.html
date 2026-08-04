@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>자율이냐 결정론이냐 — AI 에이전트 오딘이 하이브리드로 수렴하기까지</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1419; --panel: #161b22; --ink: #e6edf3; --muted: #8b949e;
+    --line: #30363d; --llm: #bc8cff; --det: #7dcfff; --warn: #d29922;
+    --green: #3fb950; --code-bg: #0d1117;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--ink); font-family: 'IBM Plex Sans KR', sans-serif; line-height: 1.75; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 0 24px; }
+  ::selection { background: rgba(188,140,255,0.3); }
+  .hero { padding: 80px 0 56px; border-bottom: 1px solid var(--line); }
+  .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 20px; }
+  .eyebrow .l { color: var(--llm); } .eyebrow .d { color: var(--det); }
+  .hero h1 { font-size: clamp(28px, 4.5vw, 44px); font-weight: 700; line-height: 1.22; letter-spacing: -0.02em; }
+  .hero .lede { margin-top: 22px; color: var(--muted); font-size: 17px; border-left: 3px solid var(--llm); padding-left: 18px; }
+  .meta { margin-top: 28px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--muted); display: flex; gap: 16px; flex-wrap: wrap; }
+  .meta .dot { color: var(--green); }
+  article { padding: 40px 0; }
+  h2 { font-size: 25px; font-weight: 700; margin: 60px 0 20px; letter-spacing: -0.01em; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+  h2 .num { font-family: 'JetBrains Mono', monospace; font-size: 15px; color: var(--llm); margin-right: 10px; }
+  h3 { font-size: 19px; font-weight: 600; margin: 40px 0 14px; color: #fff; }
+  p { margin: 15px 0; font-size: 16px; }
+  strong { color: #fff; font-weight: 600; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: rgba(110,118,129,0.2); padding: 2px 6px; border-radius: 5px; color: #c9d1d9; }
+  pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; overflow-x: auto; margin: 20px 0; }
+  pre code { background: none; padding: 0; font-size: 12.5px; line-height: 1.65; }
+  blockquote { border-left: 3px solid var(--warn); background: var(--panel); padding: 14px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; color: var(--muted); font-size: 14.5px; }
+  blockquote strong { color: var(--ink); }
+  ul, ol { margin: 16px 0; padding-left: 22px; }
+  li { margin: 8px 0; font-size: 16px; }
+  table { width: 100%; border-collapse: collapse; margin: 22px 0; font-size: 14px; }
+  th, td { border: 1px solid var(--line); padding: 9px 13px; text-align: left; vertical-align: top; }
+  th { background: var(--panel); font-weight: 600; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; }
+  td code { font-size: 0.82em; white-space: nowrap; }
+  .t-llm th { color: var(--llm); } .t-det th { color: var(--det); }
+  .era { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 6px; margin-right: 8px; vertical-align: middle; }
+  .era.a { background: var(--llm); color: var(--bg); }
+  .era.b { background: var(--det); color: var(--bg); }
+  .era.c { background: linear-gradient(90deg, var(--llm), var(--det)); color: var(--bg); }
+  footer { border-top: 1px solid var(--line); padding: 32px 0 64px; color: var(--muted); font-size: 13px; font-family: 'JetBrains Mono', monospace; }
+  footer a { color: var(--det); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow"><span class="l">autonomy</span> vs <span class="d">determinism</span> · series finale</div>
+    <h1>자율이냐 결정론이냐 —<br>AI 에이전트 오딘이 하이브리드로 수렴하기까지</h1>
+    <p class="lede">시리즈 4편(완결편). 앞선 편들 — <a href="20260713-svn-to-git-migration.html" style="color:var(--det)">1편 SVN→Git 이주</a>(일하는 방식의 원형), <a href="20260713-mcp-framework-retrospective.html" style="color:var(--det)">2편 MCP 프레임워크 12가지 결정</a>(표준 부재기의 설계), <a href="20260713-axcampus-education-platform.html" style="color:var(--det)">3편 AX캠퍼스 교육 플랫폼</a>(인에이블먼트). 이번 편은 그 위에서 동작하는 에이전트 이야기다. 이 글은 완결된 회고가 아니다 — 오딘은 지금도 진화 중이고, 이 글은 <strong style="color:var(--ink)">아키텍처가 수렴해 온 기록</strong>이다.</p>
+    <div class="meta"><span><span class="dot">●</span> 2026.2~ · 한솔그룹</span><span>ODIN · AI Agent</span><span>ReAct → 결정론 → 하이브리드</span></div>
+  </div>
+  <article>
+
+  <h2><span class="num">01</span>왜 에이전트가 필요했나 — 사람이 떠난 자리</h2>
+  <p>레거시 엔터프라이즈 시스템에서 정말로 사라지는 건 코드가 아니다. 코드는 그대로 남는다. 사라지는 건 "이 코드가 왜 이렇게 짜였는지"라는 맥락이다. 원 개발자가 퇴사하면 로직의 이유가 함께 떠난다. 지식은 문서가 아니라 사람 머릿속에 있었기 때문이다.</p>
+  <p>운영담당자가 매일 부딪히는 질문은 세 가지다. 이 화면은 어떻게 동작하나 — 그런데 코드는 암호 같은 코드명 투성이고 문서는 없고 만든 사람은 퇴사했다. 이걸 바꾸면 어디가 터지나 — 전수 조사가 불가능하니 감으로 배포하고 사고로 배운다. 이 데이터를 어떻게 뽑나 — 아는 사람을 찾아 며칠을 쓴다.</p>
+  <p>이 시장의 통증은 "코드를 못 짜서"가 아니라 "알던 사람이 나가서"다. 코드 생성이 아니라 <strong>이해의 문제</strong>라는 뜻이다.</p>
+  <p>오딘은 이 공백을 메우는 에이전트다. 레거시 DB와 Java 기반 시스템을 분석해 프로시저 간 호출 관계와 데이터 흐름을 추적하고, 코드 구간별 비즈니스 의미를 해석해 지식 베이스에 영구 축적한다. 첫 적용 대상이었던 한솔그룹 HR 시스템 '다빈치' 기준으로 수만 개 파일·천만 단어대 코드베이스에서 수만 개의 노드와 수십만 개의 관계를 추출했다.</p>
+  <p>문제 정의까지는 명확했다. 문제는 "에이전트를 어떻게 만드느냐"였고, 여기서부터 이 글의 본론이 시작된다. 오딘의 아키텍처는 세 번 크게 움직였다. 완전 자율에서 결정론으로, 결정론에서 하이브리드로.</p>
+
+  <h2><span class="num">02</span><span class="era a">1기</span>완전 자율 ReAct — 무엇을 기대했고 무엇이 무너졌나</h2>
+  <p><strong>(2026-02-09 ~ 2026-03-30)</strong></p>
+  <p>오딘의 첫 커밋(2026-02-09, <code>299dd6b55</code>)에는 <code>agent_loop.py</code>가 들어 있고, 그 docstring은 문자 그대로 이렇다.</p>
+  <blockquote>"ReAct Agent Loop - the core engine that drives tool-use cycles."</blockquote>
+  <p>시작부터 정통 ReAct였다. LLM에게 도구 목록을 주고, 모델이 생각하고(Reason) 도구를 부르고(Act) 결과를 관찰하며 답에 도달하게 한다. 기대는 단순했다. 모델이 충분히 똑똑하니 알아서 탐색하리라는 것.</p>
+  <p>무너진 방식은 두 가지였고, 둘 다 기록이 남아 있다.</p>
+  <p><strong>첫째, 컨텍스트 폭발.</strong> 한 프로세스 설계 검토 질문에서 도구 호출 18번 만에 약 524만 토큰이 쌓여(한도 약 100만) "prompt is too long"으로 크래시했다. 개발 서버에서 하루 9회 발생했다. 패턴도 규명돼 있다. 지식 베이스가 빈 결과를 주면 모델은 멈추거나 되묻는 대신 전체 파일 광역 검색으로 에스컬레이션했고, 대형 결과가 컨텍스트에 누적되다 터졌다.</p>
+  <p><strong>둘째, 할루시네이션.</strong> 더 뼈아픈 교훈은 이걸 막으려던 시도에서 나왔다. "근거 없으면 답하지 마라"를 프롬프트에 아무리 강하게 써도 모델은 무시하고 지어냈다. 여기서 얻은 결론이 이후 모든 설계를 관통한다 — <strong>프롬프트는 권고일 뿐, 모델은 무시할 수 있다. 보장이 필요하면 코드로 강제해야 한다.</strong></p>
+  <p>물론 루프를 살리려는 시도가 먼저 있었다. 복잡도 기반 품질 게이트(3/9), 자율 루프 위에 고정 순서 오케스트레이션을 얹은 "스킬" 시스템(3/31), 그리고 예산 엔진까지 동원한 대규모 개선 스프린트(4/17). 전부 루프 위에 덧대는 패치였다.</p>
+  <p>끝은 패치가 아니라 판정으로 왔다. 사용자 피드백 한 줄 — <strong>"답변 퀄리티가 바닥."</strong> 2026-04-21, 점진 패치를 포기하고 엔진을 바닥부터 재설계하기로 확정했다. 이틀 뒤 <code>agent_loop.py</code>는 삭제됐다.</p>
+  <h2><span class="num">03</span><span class="era b">2기</span>결정론적 하네스 — 통제를 얻고 무엇을 잃었나</h2>
+  <p><strong>(2026-04-21 ~ 2026-07 초)</strong></p>
+  <p>재설계된 엔진은 스테이지 파이프라인이다. 질문 분류부터 답변 저장까지를 코드가 고정한 순서로 실행하고, LLM은 그 안의 특정 슬롯에서만 호출된다. 첫날 하루에 전 스테이지가 세워졌고, 파이프라인과 함께 다섯 원칙이 선언됐다. 현재도 엔진 패키지 docstring에 "non-negotiable"로 남아 있다.</p>
+  <blockquote>1. 원본 질의 불변성 2. 루프 폐쇄(빈 결과는 다음 폴백으로) 3. <strong>결정론/LLM 분리 — 구조 추출은 결정론, 의미 해석만 LLM</strong> 4. <strong>그라운딩 하드 게이트 — 합성된 주장은 근거 위치를 인용해야 하고, 검증 안 되는 인용은 재합성</strong> 5. 복리 축적(발견은 영구 저장, 다음 세션은 그 위에서 시작)</blockquote>
+  <p>이 시기에 얻은 것은 실재하고, 지금도 오딘의 해자다.</p>
+  <ul>
+    <li><strong>날조 차단의 다층 방어.</strong> 인용은 증거에서 코드가 생성한 화이트리스트로만 검증된다. 근거가 전무한데 본문이 구체적 주장을 하면 본문 전체를 결정론적으로 정직한 고지로 교체한다. 침묵으로 게이트를 빠져나가는 것도 막았다 — 화이트리스트가 있는데 인용이 0이면 그 자체가 실패다.</li>
+    <li><strong>결정론 스테이지의 비용.</strong> 나중의 측정으로 확인된 사실인데, 증거 수집(COLLECT)을 포함한 결정론 스테이지들의 턴 내 시간 점유율은 사실상 0이다(수집 0.1초 수준). 결정론은 공짜다.</li>
+    <li><strong>회귀 게이트.</strong> 골든 픽스처와 아키텍처 가드 테스트로 "어제 되던 게 오늘 안 되는" 상황을 기계적으로 잡는 체계.</li>
+  </ul>
+  <p>결정론의 정점은 2026-05-17이었다. 그래프 순회(TRAVERSE)와 노드별 LLM 해석(ENRICH)이라는 LLM 스테이지 두 개를 아예 제거하고, LLM을 한 번도 부르지 않는 결정론 수집기 COLLECT로 대체했다. 지금도 <code>collect.py</code> 헤더의 첫 번째 설계 원칙은 "LLM 호출 0회"다.</p>
+
+  <h3>과보정의 기록</h3>
+  <p>그런데 통제를 조이는 동안, 잃고 있는 것의 목록도 쌓이고 있었다. 저장소에 남은 자기 진단들을 시간순으로 늘어놓으면 이렇다.</p>
+  <p><strong>키워드 라우팅의 반복 사고.</strong> 자연어 질문의 의도를 키워드 점수로 분류하는 결정론 분류기는 반복적으로 오발했다. 실사용 기록에는 "확인해봐"의 '확인'이 확인이력 메뉴로, 영어 단어 하나가 무관한 검색 화면 앵커로 매칭돼 자율 탐색 기회를 코드가 가로챈 사례가 남아 있다. 패치를 다섯 번 넘게 거듭한 끝에 내린 결론이 문서에 그대로 있다 — <strong>"패치가 쌓이는 것 자체가 자리가 틀렸다는 증거."</strong></p>
+  <p>더 나쁜 건 오분류의 비가역성이었다. 파이프라인이 단일 선택·분기 후 회복 불가 구조라서, 분류가 한 번 빗나가면 잘못된 합성 프롬프트로 끝까지 갔다. 분류 정확도에 모든 부담이 쏠렸고, 키워드 규칙을 아무리 정교화해도 규칙 기반의 천장을 못 넘었다.</p>
+  <p><strong>고정 예산의 양면 실패.</strong> 심층 분석 스테이지는 방문 개수 예산이 고정이었는데, 좁은 질문("이 프로시저가 INSERT하는 테이블만")에서는 15개를 방문하고 답변이 실제 사용한 건 3개(80% 낭비), 넓은 질문에서는 반대로 예산 캡에 막혔다. 질문의 필요를 모르는 채 미리 파는 구조 자체의 한계였다.</p>
+  <p><strong>능력의 조용한 증발.</strong> 자율 탐색 능력이 특정 스테이지와 플래그에 묶여 있어서, 그 스테이지가 스킵되는 실행 모드에서는 능력이 보상 장치도 고지도 없이 사라졌다. 어떤 질문 유형은 자율성이 아예 배선돼 있지 않아 "지목해도 더 파볼 수 없는" 막다른 길이었다.</p>
+  <p><strong>구조적 미스매치.</strong> 가장 근본적인 진단은 이것이다. 엔진 골격은 CoT 모양이다 — 결정론이 증거를 미리 다 긁어다 주고 LLM이 한 번에 답을 쓴다. 그런데 레거시 분석이라는 문제는 ReAct 모양이다 — 방금 읽은 소스가 다음에 뭘 열어야 할지를 결정한다. 간접 참조(포워드, 팝업, 리플렉션, 동적 디스패치)는 무한해서 <strong>그래프는 원리상 절대 완전할 수 없다.</strong> 게다가 추론이 두 곳으로 쪼개져 있었다 — "탐색하는 놈은 최종 답의 필요를 모르고, 답 쓰는 놈은 탐색을 못 한다."</p>
+  <p>수치도 있다. 개발 서버 한 달치 로그에서 자율 탐색 루프의 40%(21/52)가 미해결로 끝났고, 합성 단계의 미니 루프는 라운드를 돌아도 새 인용으로 이어진 비율이 1% 수준이었다(재측정에서도 루프 발동의 98.5%가 새 인용 0이었다).</p>
+  <p><strong>프롬프트에도 과보정이 쌓였다.</strong> 합성 프롬프트에는 금지 조항이 66개까지 불어나 있었다. 최근의 통제 실험(3개 프롬프트 변형 × 2모델 × 반복, 12실행 24턴)이 이 덩어리를 갈랐다. 엔진 내부 어휘 누출을 막는 규칙 36줄(파일의 12%)은 빼도 아무 일도 일어나지 않았다 — 이미 코드 게이트가 같은 일을 하고 있었기 때문이다. 반면 "1~2개만 읽고 작성하면 reject" 같은 위협 문구는 강제하는 코드가 없는 거짓 위협인데도 모델 행동을 바꾸고 있었다. 결론은 프롬프트 축소가 아니라 이관이었다 — 기계가 검사할 수 있는 규칙은 프롬프트에서 코드로 옮기고, 측정으로 사망이 증명된 분량만 제거했다(310줄→279줄). 문서의 결론 문장이 좋다. <strong>"얻은 것은 토큰이 아니다. 거짓 위협 제거와 확률→보장 전환이다."</strong></p>
+  <p>이 시기를 관통하는 한 문장이 북극성 문서에 있다.</p>
+  <blockquote><strong>"v1이 실패한 건 자율이라서가 아니라 무제약·무근거라서였다."</strong></blockquote>
+  <p>결정론 전환은 옳았다. 다만 치료가 병소보다 넓었다. 무제약을 잘라내면서 자율까지 잘라냈던 것이다.</p>
+  <h2><span class="num">04</span><span class="era c">3기</span>하이브리드 — 경계를 어디에 그었고, 왜 거기인가</h2>
+  <p><strong>(2026-07-15 ~ 현재)</strong></p>
+  <p>2026년 7월, 방향이 문서로 확정됐다. 독트린은 한 문장이다.</p>
+  <blockquote><strong>"결정권은 모델로, 검증권은 코드로."</strong></blockquote>
+  <p>이유도 명시돼 있다. 하네스가 모델 대신 생각하면(케이스별 예외 코드) 모델이 발전할 때마다 하네스가 짐이 된다. 하네스가 게이트와 측정만 하면 모델 발전이 공짜 업그레이드가 된다. 무엇을 만들고 무엇을 안 만들지의 리트머스는 세 단어로 압축됐다 — <strong>배관은 만든다, 저울은 결정론, 모델 대신 생각하는 코드는 안 만든다.</strong></p>
+
+  <h3>무엇을 LLM에게 돌려줬나</h3>
+  <p><strong>첫째, 의도 파악.</strong> 키워드 인텐트 분류층을 통째로 철거했다(7/23 라우팅 역전, 7/27 잔재 청산 — 순감 1,150줄, 엔진 테스트 1,449건 회귀 0). 현재 <code>classify.py</code> 헤더의 선언: "No LLM call, and no keyword intent guessing. (...) <strong>의도 파악은 모델의 일이다.</strong>" 남은 결정론 판정은 슬래시 명령 접두어와 재해석 수식어, 딱 둘이다.</p>
+  <p>계약은 3단이다. <strong>슬래시 명령 = 결정론 유지</strong>(사용자가 의도를 선언했으니 코드가 직행 라우팅), <strong>자연어 = 자율 기본</strong>(질문 원문 그대로, 모델이 의도를 파악하고 탐색), <strong>답변 = 결정론 구속</strong>(어느 경로로 왔든 그라운딩 게이트를 통과해야 한다).</p>
+  <p><strong>둘째, 탐색 경로.</strong> 증거 수집을 "코드가 미리 다 긁어다 주는" push에서 "모델이 필요한 걸 당겨오는" pull로 뒤집기 시작했다. 합성 단계에 소스 검색·읽기 도구를 쥐여준 루프를 켠 A/B 실측에서: 소스 파일 직접 읽기 0회→4회, 동적 인용 수확 0건→4건, 턴 시간 558초→284초. 커밋 본문의 관찰 — "모델이 JSP→Java→mapper XML을 스스로 관통했다. 찾은 단서를 다시 검색하는 grep→read→grep 사슬, 긴 파일은 구간을 나눠 이어 읽었다." 이 실측으로 루프는 기본값으로 승격됐다.</p>
+  <p><strong>셋째, 판정의 일부.</strong> "질문에 실제로 답했는가"(응답성)는 결정론으로 판정할 수 없는 정성 영역이다. 오딘의 게이트 중 유일하게 LLM 심판을 쓰는 intent-fit 게이트가 이걸 맡는다. 단, 소프트 게이트다 — 심판의 오판 가능성을 인정하고 차단기가 아니라 개선 드라이버로만 쓴다.</p>
+
+  <h3>인버전이 스스로를 교정한 기록</h3>
+  <p>이 전환에서 가장 값진 자료는 성공담이 아니라 설계 문서에 남은 자기정정 기록이다. 하루 사이에 저자(나)가 자기 진단을 두 번 뒤집는다.</p>
+  <ol>
+    <li>최초 진단: "루프가 못 뚫는 진짜 뿌리는 저장 프로시저 추출 공백이다."</li>
+    <li>자백: "틀린 테이블만 조회한 오진이다." 데이터는 다른 테이블에 완비돼 있었다(그래프 엣지 수만 개, 프로시저 대부분이 참조 보유). 진짜 문제는 루프가 이미 있는 조회 도구를 부르지 않았다는 것 — 오히려 인버전 논지를 입증하는 발견.</li>
+    <li>반례 수용: 그런데 실측 프로브가 핵심 명제에 반례를 냈다. "이 조작이 최종적으로 어떤 테이블에 쓰는가" 같은 터미널 추적은 자율 루프가 아니라 <strong>결정론적 그래프 순회 문제</strong>였다. 결론 — "인버전은 전면이 아니라 <strong>결정론이 못 미치는 곳에 국한</strong>한다."</li>
+  </ol>
+  <p>실패 시 대응도 미리 명문화돼 있었다. "프로브가 RED이면? 결정론 전반부가 하중을 받치고 있음을 배운 것이다. 유지하고 구멍만 닫는다. 이것도 값진 답." 하이브리드는 이념으로 정한 노선이 아니라, 측정이 반례를 낼 때마다 경계를 다시 그은 결과라는 뜻이다.</p>
+  <h3>현재의 경계 지도</h3>
+  <p>지금 코드 기준으로, 엔진 전체에서 LLM이 호출되는 지점과 코드가 결정하는 지점은 이렇게 갈린다. (전수 grep으로 확인한 실측 지도다.)</p>
+  <p><strong style="color:var(--llm)">LLM이 결정하는 것</strong></p>
+  <table class="t-llm">
+    <tr><th>결정</th><th>위치</th></tr>
+    <tr><td>질문 이해 — 의도·초점·답변 양식 (경량 모델 1콜, 12초 타임아웃)</td><td><code>qu_stage.py</code></td></tr>
+    <tr><td>코드 구간의 비즈니스 의미 해석</td><td><code>interpret_stage.py</code></td></tr>
+    <tr><td>객체별 비즈니스 요약</td><td><code>deepen_stage.py</code></td></tr>
+    <tr><td>탐색 경로 — 다음에 어떤 도구를 어떤 인자로 부를지</td><td><code>tool_loop.py</code></td></tr>
+    <tr><td>최종 답변 본문 작성</td><td><code>llm_strategy.py</code></td></tr>
+    <tr><td>응답성 심사(질문에 답했는가)</td><td><code>intent_fit.py</code></td></tr>
+  </table>
+  <p><strong style="color:var(--det)">코드가 결정하는 것</strong></p>
+  <table class="t-det">
+    <tr><th>결정</th><th>위치</th></tr>
+    <tr><td>스테이지 순서 (리스트 리터럴 고정, 조기 종료 없음)</td><td><code>runtime.py</code>, <code>pipeline.py</code></td></tr>
+    <tr><td>라우팅 — 슬래시 접두어만 결정론, 자연어는 전부 자율 경로</td><td><code>classify.py</code></td></tr>
+    <tr><td>인텐트별 정책 — 예산, 루프 개폐, 라운드 상한 (선언 테이블)</td><td><code>intent_policy.py</code></td></tr>
+    <tr><td>앵커 탐색 캐스케이드 (LLM 0)</td><td><code>seed.py</code></td></tr>
+    <tr><td>증거 수집 (LLM 0)</td><td><code>collect.py</code></td></tr>
+    <tr><td>인용 화이트리스트 생성과 대조</td><td><code>synthesize.py</code></td></tr>
+    <tr><td>그라운딩 게이트, 근거 부재 시 본문 교체</td><td><code>ground_gate/</code></td></tr>
+    <tr><td>목록·개수 질의 — 모델이 세지 않고 <code>COUNT(*)</code>가 답한다</td><td><code>enumeration.py</code></td></tr>
+    <tr><td>저장 게이트와 출처 기록</td><td><code>wiki_store.py</code></td></tr>
+  </table>
+  <p><strong>결합부 — LLM 판단에 코드가 채우는 구속구</strong></p>
+  <ul>
+    <li>질문 이해 결과의 앵커 이름은 탐색 후보와 질문 원문 밖이면 무효(clamp). 신뢰도 하한 미달이면 소비처가 결정론 동작을 유지한다.</li>
+    <li>자율 루프에는 울타리가 넷이다. 도구 화이트리스트(목록 밖 호출은 에러로 반려하되 모델이 볼 수 있게 — 조용한 무시가 아니다), 라운드 상한(증거 수집 15, 합성 8), 벽시계 시간 상한, 그리고 포화 감지(연속 두 라운드의 도구 호출 지문이 같으면 수확 체감으로 종료).</li>
+    <li>자율 루프가 수집한 모든 결과는 결정론 파일명으로 각인돼 인용 화이트리스트의 키가 된다. 자율 탐색의 산출물조차 그라운딩 게이트의 어휘로 편입되는 구조다.</li>
+    <li>LLM 심판의 판정은 스키마 밖 어휘를 내면 통과가 아니라 보류로 강등된다(심판 출력을 세탁해 게이트를 빠져나가는 경로 차단). 재작성 상한 1회는 프롬프트 지시가 아니라 코드 구조(루프 없는 단일 분기)로 강제된다. 심판이 "이 객체를 봤어야 했다"고 지목하면, 코드가 지식 베이스 존재 검증을 통과한 것만 증거로 확보해 준다.</li>
+    <li>탐색권과 작성권은 분리돼 있다. 증거 수집 루프에서 모델이 중간에 뱉는 본문 텍스트는 이벤트 싱크가 걷어내 사용자에게 도달하지 않는다. 본문 작성권은 합성 단계의 독점이다.</li>
+  </ul>
+  <p><strong>실패 처리도 같은 문법이다.</strong> LLM 호출 실패는 분류해서 다르게 다룬다 — 4xx(요청 자체의 문제)는 즉시 드러내고, 전송 오류와 5xx만 폴백한다. 출력이 토큰 한도에서 잘리면 절단 지점부터 자동 이어쓰기(상한 3회). 그라운딩 게이트 실패 시엔 LLM 재생성 전에 결정론 수술을 먼저 시도한다 — 미검증 인용 마커만 제거하고 재검증하면 통과하는 경우가 많은데, 이 순서 하나로 인용 10건 때문에 1만 자를 127초 들여 재생성하던 낭비가 사라졌다. 근거가 아예 없으면 모델에게 "정직하게 쓰라"고 부탁하는 게 아니라 코드가 ⚠️ 고지를 결정론적으로 붙인다. 반대 방향도 있다 — 근거가 충분한데 모델이 소심하게 "미검증"을 달면, 게이트가 증명한 경우에 한해 코드가 그 머리말을 걷어낸다. <strong>정직성은 양방향으로 강제된다.</strong></p>
+  <p>이 경계는 인터페이스가 아니라 파이프라인에 있다. 최근 열린 MCP 게이트웨이(외부 에이전트가 오딘을 도구로 쓰는 표면)도 분석성 도구는 엔진 파이프라인을 완주한 결과만 반환한다. 어느 문으로 들어와도 게이트는 같다.</p>
+
+  <h3>남아 있는 구멍 (진화 중이라는 증거)</h3>
+  <p>정직하게 적자면, 프롬프트 다이어트 실험이 제품 결함도 하나 드러냈다. 근거 검증 배지는 "인용된 객체가 실재하는가"를 재지 "주장이 근거와 맞는가"를 재지 않는다 — 실험의 한 팔에서 모델이 존재하지 않는 테이블로 SQL을 지어냈는데 검증 배지가 붙은 사례가 잡혔다. 주장–근거 대조 게이트가 다음 키스톤으로 등재돼 있다. 수렴은 끝이 아니라 현재 위치다.</p>
+  <h2><span class="num">05</span>수렴에서 배운 것 — 이분법이 아니라 경계 설정 문제</h2>
+  <p>"자율성 vs 결정론"은 업계가 계속 반복하는 논쟁이다. 워크플로(코드가 순서를 정한다)냐 에이전트(모델이 순서를 정한다)냐. 6개월간 양극단을 다 살아본 결론은, 이건 양자택일이 아니라 <strong>경계선을 어디에 긋느냐의 문제</strong>라는 것이다. 오딘의 경계선은 세 가지 기준으로 그어졌고, 전부 실패의 흉터에서 나왔다.</p>
+  <p><strong>1. 정답이 유일하고 기계로 검사 가능하면 코드.</strong> 개수는 <code>COUNT(*)</code>이지 주장이 아니다 — 틀릴 수 없다. 객체가 존재하는가, 인용이 증거에 있는가, 출력 형식이 계약에 맞는가. 이런 건 모델에게 시키면 확률이고 코드로 하면 보장이다. 1기의 교훈("프롬프트는 모델이 무시한다")이 여기 산다.</p>
+  <p><strong>2. 정성 판단은 모델.</strong> 질문의 의도가 무엇인가, 다음에 어떤 파일을 열어야 하는가, 이 답변이 질문에 응답했는가. 이걸 코드로 흉내 내면 키워드 분류기가 된다 — 그리고 키워드 분류기의 말로는 2기에서 봤다. 패치가 쌓이는 것 자체가 자리가 틀렸다는 증거였다.</p>
+  <p><strong>3. 모델의 판단에는 반드시 코드 구속구를 채운다.</strong> 화이트리스트, 상한, clamp, 포화 감지, 그리고 마지막의 하드 게이트. 자율은 허용하되 무제약은 허용하지 않는다. v1의 진짜 사인은 자율이 아니라 무제약이었으니까.</p>
+  <p>그리고 메타 교훈이 하나 더 있다. <strong>경계선은 고정이 아니라 측정으로 움직인다.</strong> 인버전 프로브가 반례를 내자 "터미널 추적은 결정론"으로 되돌렸고, 프롬프트 다이어트는 측정으로 사망이 증명된 조항만 걷어냈다. 경계를 옮길 때마다 가드 테스트(fitness function)로 동결해서, 철거한 패턴이 부활하면 CI가 막는다 — 실제로 "키워드 판정을 라우팅에서 소비하면 철거한 층의 부활"이라고 실패 메시지에 박아 둔 테스트가 돌고 있다. 손으로 감사한 위배는 영구 자동화된다.</p>
+  <p>모델 선택도 같은 태도로 다뤘다. 3개 모델 통제 비교에서 최상위 모델과 최하위 모델의 비용 차는 11.8배, 수집한 근거 차는 7.6배였다 — "값이 싼 게 아니라 덜 조사한 것". 동시에 같은 질문을 두 번 돌리면 비용이 1.45배까지 출렁였으므로, 1회 측정으로 순위를 단정하지 않는다는 단서도 함께 기록했다. 멀티턴 실험에서 가장 견고했던 발견은 이것이다 — <strong>"한방 프롬프트는 없다."</strong> 세 세션 전부에서 후속 턴이 새 근거를 가져왔고, 0으로 수렴한 턴이 하나도 없었다.</p>
+  <p>하이브리드가 자율과 결정론의 어중간한 타협이 아니라는 점을 마지막으로 강조하고 싶다. 방향 문서의 표현을 빌리면 이것은 "bounded, verified ReAct" — 전면 회귀의 정반대다. 결정권과 검증권을 분리하면 두 세계의 좋은 것만 남는다. 모델이 좋아지면 결정이 좋아지고(하네스는 손대지 않는다), 게이트는 어느 모델이 오든 같은 것을 보장한다.</p>
+
+  <h2><span class="num">06</span>시리즈를 맺으며 — 도구는 바뀌지만 방식은 남는다</h2>
+  <p>이 시리즈는 <a href="20260713-svn-to-git-migration.html" style="color:var(--det)">SVN에서 Git으로 옮기던 이야기(1편)</a>에서 시작했다. 버전 관리 도구를 바꾸는 일이 아니라 일하는 방식의 원형을 만드는 일이었다. <a href="20260713-mcp-framework-retrospective.html" style="color:var(--det)">2편의 MCP 프레임워크</a>는 표준이 없던 시기에 12가지 결정을 내리고 기록하는 일이었고, <a href="20260713-axcampus-education-platform.html" style="color:var(--det)">3편의 교육 플랫폼</a>은 그 방식을 조직에 흘려보내는 인에이블먼트였다.</p>
+  <p>오딘은 그 위에서 동작한다. 문자 그대로다 — 오딘의 지식은 Git 저장소에서 추출되고, 외부와는 MCP 표면으로 연결되며, 최종 사용자는 그 방식 위에서 일하도록 훈련받은 사람들이다. 그리고 은유로도 그렇다. 이 글에서 반복된 루프 — 실측하고, 진단을 문서로 남기고, 틀리면 자기정정을 기록하고, 결정을 가드로 동결하는 — 는 1편에서 이주 계획을 세우던 방식과 같은 것이다.</p>
+  <p>에이전트 아키텍처의 유행은 이 글이 발행되는 순간에도 바뀌고 있을 것이다. 오딘의 경계선도 또 움직일 것이다. 그래도 남는 게 있다면, 경계선을 긋는 방식 — 이념이 아니라 측정으로, 선언이 아니라 기록으로, 그리고 한 번 배운 실패는 코드로 동결해서 두 번 배우지 않는 것. <strong>도구는 계속 바뀌지만, 방식은 남는다.</strong></p>
+  </article>
+  <footer>이 글의 커밋 해시·파일 경로·수치는 오딘 저장소에서 실측·인용했다. 회사·시스템명(한솔그룹·다빈치)은 앞선 시리즈와 같이 공개로 표기하되, 도메인 규모 등 세부 수치는 범위 수준으로 일반화했다.
+  <br><br>시리즈: <a href="20260713-svn-to-git-migration.html">1편 SVN→Git</a> · <a href="20260713-mcp-framework-retrospective.html">2편 MCP 프레임워크</a> · <a href="20260713-axcampus-education-platform.html">3편 AX캠퍼스</a> · 4편(이 글)
+  <br><br><a href="../index.html">← June Viz Notes</a></footer>
+</div>
+</body>
+</html>
