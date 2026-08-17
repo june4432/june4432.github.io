@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>경제학 LLM 위키</title>
+<style>
+  :root{
+    --bg:#faf8f4; --card:#ffffff; --ink:#2b2a27; --sub:#6f6a60;
+    --accent:#8a5a2b; --accent-soft:#f0e6d8; --line:#e6e0d4;
+    --link:#1a5fa8; --red:#b03a2e; --done:#3d7a4a;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#181613; --card:#221f1b; --ink:#e8e3da; --sub:#a49c8e;
+      --accent:#d4a163; --accent-soft:#33291d; --line:#3a352d;
+      --link:#7fb2e8; --red:#e07b6f; --done:#7fbf8c;
+    }
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Noto Sans KR",sans-serif;
+    line-height:1.75; font-size:16px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:720px; margin:0 auto; padding:28px 20px 80px;}
+  header.site{border-bottom:2px solid var(--accent); padding-bottom:18px; margin-bottom:24px;}
+  header.site h1{font-size:1.7rem; letter-spacing:-.01em;}
+  header.site p.tag{color:var(--sub); font-size:.92rem; margin-top:6px;}
+  .howto{
+    background:var(--accent-soft); border-radius:12px; padding:16px 18px;
+    font-size:.92rem; margin-bottom:30px;
+  }
+  .howto b{color:var(--accent);}
+  h2.stage{
+    font-size:1.05rem; margin:34px 0 4px; color:var(--accent);
+    display:flex; align-items:baseline; gap:8px;
+  }
+  h2.stage .n{
+    font-size:.75rem; background:var(--accent); color:var(--bg);
+    border-radius:99px; padding:1px 9px; font-weight:600; white-space:nowrap;
+  }
+  p.stage-desc{color:var(--sub); font-size:.88rem; margin-bottom:10px;}
+  ul.papers{list-style:none;}
+  ul.papers li{
+    padding:10px 2px; border-bottom:1px solid var(--line);
+    display:flex; align-items:baseline; gap:9px; font-size:.97rem;
+  }
+  .st{font-size:.72rem; border-radius:6px; padding:1px 7px; white-space:nowrap; font-weight:600;}
+  .st.done{color:var(--done); border:1px solid var(--done);}
+  .st.todo{color:var(--red); border:1px solid var(--red); opacity:.85;}
+  a{color:var(--link); text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  a.redlink{color:var(--red); border-bottom:1px dashed var(--red); cursor:help;}
+  footer{margin-top:48px; color:var(--sub); font-size:.82rem; border-top:1px solid var(--line); padding-top:16px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="site">
+    <h1>경제학 LLM 위키</h1>
+    <p class="tag">고전 논문부터 현대 이론까지 — 대화하며 자라나는 개인 위키</p>
+  </header>
+
+  <div class="howto">
+    <b>사용법</b> · 읽다가 궁금한 논문(<span style="color:var(--red)">빨간 링크</span> = 아직 없는 페이지)이 생기면,
+    Claude 앱에서 <b>"위키에 ○○ 페이지 추가해줘"</b>라고 요청하세요. 생성 후 push되면 이 사이트에 바로 나타납니다.
+  </div>
+
+  <h2 class="stage"><span class="n">1단계</span> 화폐·이자의 고전</h2>
+  <p class="stage-desc">"이자율은 왜 존재하고 어떻게 결정되는가"라는 하나의 질문을 따라가는 척추(spine).</p>
+  <ul class="papers">
+    <li><span class="st done">작성됨</span><a href="hume-of-money.html">Hume — Of Money (1752)</a></li>
+    <li><span class="st todo">미작성</span><a class="redlink" title="Claude에게 요청해 생성">Hume — Of Interest (1752)</a></li>
+    <li><span class="st todo">미작성</span><a class="redlink" title="Claude에게 요청해 생성">Fisher — The Theory of Interest (1930)</a></li>
+    <li><span class="st todo">미작성</span><a class="redlink" title="Claude에게 요청해 생성">Wicksell — Interest and Prices (1898)</a></li>
+    <li><span class="st todo">미작성</span><a class="redlink" title="Claude에게 요청해 생성">Keynes — 일반이론: 유동성 선호 (1936)</a></li>
+    <li><span class="st todo">미작성</span><a class="redlink" title="Claude에게 요청해 생성">Friedman — The Role of Monetary Policy (1968)</a></li>
+  </ul>
+
+  <h2 class="stage"><span class="n">2단계</span> 정보와 계약</h2>
+  <p class="stage-desc">시장이 실패하는 이유 — 정보비대칭과 거래비용. 경영학으로 가는 다리.</p>
+  <ul class="papers">
+    <li><span class="st todo">미작성</span><a class="redlink" title="Claude에게 요청해 생성">Coase — The Nature of the Firm (1937)</a></li>
+    <li><span class="st todo">미작성</span><a class="redlink" title="Claude에게 요청해 생성">Akerlof — The Market for Lemons (1970)</a></li>
+    <li><span class="st todo">미작성</span><a class="redlink" title="Claude에게 요청해 생성">Jensen &amp; Meckling — 대리인 이론 (1976)</a></li>
+  </ul>
+
+  <h2 class="stage"><span class="n">3단계</span> 게임이론</h2>
+  <p class="stage-desc">전략적 상호작용의 언어. 원논문은 역사적 맥락으로, 개념은 교과서로.</p>
+  <ul class="papers">
+    <li><span class="st todo">미작성</span><a class="redlink" title="Claude에게 요청해 생성">Nash — Equilibrium Points (1950)</a></li>
+    <li><span class="st todo">미작성</span><a class="redlink" title="Claude에게 요청해 생성">Schelling — The Strategy of Conflict (1960)</a></li>
+    <li><span class="st todo">미작성</span><a class="redlink" title="Claude에게 요청해 생성">Gale &amp; Shapley — 매칭 이론 (1962)</a></li>
+    <li><span class="st todo">미작성</span><a class="redlink" title="Claude에게 요청해 생성">Myerson — 메커니즘 디자인</a></li>
+  </ul>
+
+  <h2 class="stage"><span class="n">4단계</span> 현대 거시 · 행동경제학 · 경영학</h2>
+  <p class="stage-desc">1단계의 화폐 이야기가 뱅크런·정책 신뢰성 문제로 되돌아온다.</p>
+  <ul class="papers">
+    <li><span class="st todo">미작성</span><a class="redlink" title="Claude에게 요청해 생성">Lucas — Econometric Policy Evaluation (1976)</a></li>
+    <li><span class="st todo">미작성</span><a class="redlink" title="Claude에게 요청해 생성">Kydland &amp; Prescott — Rules Rather than Discretion (1977)</a></li>
+    <li><span class="st todo">미작성</span><a class="redlink" title="Claude에게 요청해 생성">Diamond &amp; Dybvig — Bank Runs (1983)</a></li>
+    <li><span class="st todo">미작성</span><a class="redlink" title="Claude에게 요청해 생성">Kahneman &amp; Tversky — Prospect Theory (1979)</a></li>
+    <li><span class="st todo">미작성</span><a class="redlink" title="Claude에게 요청해 생성">Porter — How Competitive Forces Shape Strategy (1979)</a></li>
+    <li><span class="st todo">미작성</span><a class="redlink" title="Claude에게 요청해 생성">March — Exploration and Exploitation (1991)</a></li>
+  </ul>
+
+  <footer>
+    원본: <code>~/Documents/economics-llm-wiki</code> (마크다운) · 발행: GitHub Pages ·
+    페이지 형식: ①핵심 질문 ②요약 ③핵심 아이디어 ④현대와의 연결 ⑤원문 ⑥내 코멘트
+  </footer>
+</div>
+</body>
+</html>
